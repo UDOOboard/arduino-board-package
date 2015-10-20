@@ -1,0 +1,101 @@
+
+# Arduino SAM Core and platform.
+# ------------------------------
+#
+# For more info:
+# https://github.com/arduino/Arduino/wiki/Arduino-IDE-1.5---3rd-party-Hardware-specification
+
+name=Arduino ARM (32-bits) Boards
+version=1.6.4
+
+# SAM3 compile variables
+# ----------------------
+
+compiler.warning_flags=-w
+compiler.warning_flags.none=-w
+compiler.warning_flags.default=
+compiler.warning_flags.more=-Wall
+compiler.warning_flags.all=-Wall -Wextra
+
+compiler.path=/usr/bin/
+compiler.c.cmd=arm-none-eabi-gcc
+compiler.c.flags={compiler.warning_flags} -mcpu=cortex-m4 -march=armv7e-m -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16 -Os -fmessage-length=0 -ffunction-sections -fdata-sections  -g -D_AEABI_LC_CTYPE=C -D__STRICT_ANSI__=1 -std=gnu11 -MMD -MP -c
+# Note: -fno-rtti allows to libsupc++ to be not included, resulting in a
+# smaller binary (<50K).
+
+compiler.c.elf.cmd=arm-none-eabi-gcc
+compiler.c.elf.flags=
+compiler.S.flags=-c -g -x assembler-with-cpp
+compiler.cpp.cmd=arm-none-eabi-g++
+compiler.cpp.flags={compiler.warning_flags} -mcpu=cortex-m4 -march=armv7e-m -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16 -Os -fmessage-length=0 -ffunction-sections -fdata-sections  -g -D_AEABI_LC_CTYPE=C -D__STRICT_ANSI__=1 -std=gnu++11 -fabi-version=0 -MMD -MP -c
+compiler.ar.cmd=arm-none-eabi-ar
+compiler.ar.flags=rcs
+compiler.objcopy.cmd=arm-none-eabi-objcopy
+#compiler.objcopy.eep.flags=-O ihex -j .eeprom --set-section-flags=.eeprom=alloc,load --no-change-warnings --change-section-lma .eeprom=0
+compiler.elf2hex.flags=-O binary
+compiler.elf2hex.cmd=arm-none-eabi-objcopy
+compiler.ldflags=
+compiler.size.cmd=arm-none-eabi-size
+compiler.define=-DARDUINO=
+
+# this can be overriden in boards.txt
+build.extra_flags=
+#-DMQX_LOG -DMQX_EXTRA_LOG
+
+# These can be overridden in platform.local.txt
+compiler.c.extra_flags="-I{build.variant.path}/mqx/release/bsp" "-I{build.variant.path}/mqx/release/bsp/Sources" "-I{build.variant.path}/mqx/release" "-I{build.variant.path}/mqx/release/psp" "-I{build.variant.path}/mqx/release/mcc"
+compiler.c.elf.extra_flags="-T{build.variant.path}/linker_scripts/gcc/libs.ld" 
+compiler.cpp.extra_flags="-I{build.variant.path}/mqx/release/bsp" "-I{build.variant.path}/mqx/release/bsp/Sources" "-I{build.variant.path}/mqx/release" "-I{build.variant.path}/mqx/release/psp" "-I{build.variant.path}/mqx/release/mcc"
+compiler.ar.extra_flags=
+compiler.elf2hex.extra_flags=
+compiler.libsam.c.flags=
+
+# Default usb manufacturer will be replaced at compile time using
+# numeric vendor ID if available or by board's specific value. 
+build.usb_manufacturer="Unknown"
+
+
+# SAM3 compile patterns
+# ---------------------
+
+## Compile c files
+recipe.c.o.pattern="{compiler.path}{compiler.c.cmd}" {compiler.c.flags} -mcpu={build.mcu} {compiler.c.extra_flags} {build.extra_flags} {compiler.libsam.c.flags} {includes} "{source_file}" -o "{object_file}"
+# -MF"{object_file}"
+
+## Compile c++ files
+recipe.cpp.o.pattern="{compiler.path}{compiler.cpp.cmd}" {compiler.cpp.flags} -mcpu={build.mcu} {compiler.cpp.extra_flags} {build.extra_flags} {compiler.libsam.c.flags} {includes} "{source_file}" -o "{object_file}"
+# -MF"{object_file}"
+
+## Create archives
+# excluded core.a creation because linker doesn't include some system libraries
+# (like libsupc++.a). Linking directly all the obj doesn't happen. To achieve
+# that all sources have been moved from core to variant.
+# Actually core.a has been created as a dummy file. This way the structure is
+# leaved as it is. 
+
+o core.a e con un dummy file. Cosi lascio la struttura come originale
+recipe.ar.pattern="{compiler.path}{compiler.ar.cmd}" {compiler.ar.flags} {compiler.ar.extra_flags} "{build.path}/{archive_file}" "{object_file}"
+
+#link all
+recipe.c.combine.pattern="{compiler.path}{compiler.c.elf.cmd}" -mcpu=cortex-m4 -march=armv7e-m -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16 -Os -fmessage-length=0 -ffunction-sections -fdata-sections  -g "-L{build.path}" "-L{build.variant.path}/mqx/release/psp" "-L{build.variant.path}/mqx/release/bsp" "-L{build.variant.path}/mqx/release/mcc" "-L/usr/lib/arm-none-eabi/lib/armv7e-m/fpu" "-T{build.variant.path}/{build.ldscript}" "-T{build.variant.path}/linker_scripts/gcc/libs.ld" -nostartfiles -nodefaultlibs -nostdlib -Xlinker --gc-sections "-Wl,-Map,{build.path}/{build.project_name}.map" -Xlinker --cref -z muldefs -o "{build.path}/{build.project_name}.elf" {object_files}
+# "{build.path}/{archive_file}"
+
+#-gdwarf-2 -gstrict-dwarf , indagare
+
+## Create output (.bin file)
+recipe.objcopy.bin.pattern="{compiler.path}{compiler.elf2hex.cmd}" {compiler.elf2hex.flags} {compiler.elf2hex.extra_flags} "{build.path}/{build.project_name}.elf" "{build.path}/{build.project_name}.bin"
+
+## Compute size
+recipe.size.pattern="{compiler.path}{compiler.size.cmd}" -A "{build.path}/{build.project_name}.elf"
+recipe.size.regex=\.text\s+([0-9]+).*
+
+# SAM3 Uploader tools 
+# -------------------
+
+tools.bossac.path=/usr/bin
+tools.bossac.cmd=udooneo-m4uploader
+tools.bossac.cmd.windows=m4test.sh
+tools.bossac.upload.params.verbose=-v
+tools.bossac.upload.params.quiet=-q
+tools.bossac.upload.pattern="{path}/{cmd}" "{build.path}/{build.project_name}.bin"
+
