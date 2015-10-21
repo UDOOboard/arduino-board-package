@@ -5,10 +5,10 @@
 # For more info:
 # https://github.com/arduino/Arduino/wiki/Arduino-IDE-1.5---3rd-party-Hardware-specification
 
-name=Arduino ARM (32-bits) Boards
-version=1.6.4
+name=UDOO Boards 
+version=1.6.5
 
-# SAM3 compile variables
+# M4 compile variables
 # ----------------------
 
 compiler.warning_flags=-w
@@ -89,13 +89,13 @@ recipe.objcopy.bin.pattern="{compiler.path}{compiler.elf2hex.cmd}" {compiler.elf
 recipe.size.pattern="{compiler.path}{compiler.size.cmd}" -A "{build.path}/{build.project_name}.elf"
 recipe.size.regex=\.text\s+([0-9]+).*
 
-# SAM3 Uploader tools 
+# M4 Uploader tools 
 # -------------------
 
-tools.bossac.path=/usr/bin
-tools.bossac.cmd=udooneo-m4uploader
-tools.bossac.cmd.windows=m4test.sh
-tools.bossac.upload.params.verbose=-v
-tools.bossac.upload.params.quiet=-q
-tools.bossac.upload.pattern="{path}/{cmd}" "{build.path}/{build.project_name}.bin"
+tools.m4uploader.path=/usr/bin
+tools.m4uploader.cmd=udooneo-m4uploader
+tools.m4uploader.cmd.windows=m4test.sh
+tools.m4uploader.upload.params.verbose=-v
+tools.m4uploader.upload.params.quiet=-q
+tools.m4uploader.upload.pattern="{path}/{cmd}" "{build.path}/{build.project_name}.bin"
 
