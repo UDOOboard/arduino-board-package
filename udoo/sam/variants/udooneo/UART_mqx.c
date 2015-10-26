@@ -176,7 +176,6 @@ int32_t mqx_uartclass_write (const uint8_t uc_data)
 
 int32_t mqx_uartclass_write_buffer (const uint8_t *ptr, uint16_t len)
 {
-	printf("mqx_uartclass_write_buffer \n");
 	return (write(serial_dev, (uint8_t *)ptr, len));
 }
 

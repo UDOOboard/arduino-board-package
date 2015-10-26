@@ -1,6 +1,8 @@
 #include <mqx.h>
 #include <bsp.h>
 
+#include "log_mqx.h"
+
 HWTIMER hwtimer1;                               //hwtimer handle
 
 uint32_t mqx_hwtimer_get_us (void)
