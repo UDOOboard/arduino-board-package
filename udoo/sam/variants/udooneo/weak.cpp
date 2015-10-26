@@ -12,7 +12,7 @@ void serialEventRun(void)
 }
 
 #else
-__attribute__((weak)) void serialEvent() {delay(1000);};
+__attribute__((weak)) void serialEvent() {_sched_yield();};
 __attribute__((weak)) void yield() {delay(1000);};
 __attribute__((weak)) void user_task1() {delay(1000);};
 __attribute__((weak)) void user_task2() {delay(1000);};
