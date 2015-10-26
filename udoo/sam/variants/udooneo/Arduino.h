@@ -38,7 +38,6 @@
 extern "C"{
 #endif // __cplusplus
 
-
 #include "wiring_constants.h"
 
 //#define MQX_LOG
@@ -51,26 +50,6 @@ void user_task3(void);
 /* sketch */
 extern void setup( void ) ;
 extern void loop( void ) ;
-
-//#define NOT_A_PIN 0  // defined in pio.h/EPioType
-#define NOT_A_PORT           0
-
-#define NOT_AN_INTERRUPT -1
-
-typedef enum _EExt_Interrupts
-{
-  EXTERNAL_INT_0=0,
-  EXTERNAL_INT_1=1,
-  EXTERNAL_INT_2=2,
-  EXTERNAL_INT_3=3,
-  EXTERNAL_INT_4=4,
-  EXTERNAL_INT_5=5,
-  EXTERNAL_INT_6=6,
-  EXTERNAL_INT_7=7,
-  EXTERNAL_NUM_INTERRUPTS
-} EExt_Interrupts ;
-
-typedef void (*voidFuncPtr)( void ) ;
 
 /* Define attribute */
 #if defined   ( __CC_ARM   ) /* Keil uVision 4 */
@@ -110,40 +89,6 @@ typedef enum _EPWMChannel
   NMAX_PWMS
 } EPWMChannel ;
 
-/* not used
-// Definitions for TC channels
-typedef enum _ETCChannel
-{
-  NOT_ON_TIMER=-1,
-  TC0_CHA0=0,
-  TC0_CHB0,
-  TC0_CHA1,
-  TC0_CHB1,
-  TC0_CHA2,
-  TC0_CHB2,
-  TC1_CHA3,
-  TC1_CHB3,
-  TC1_CHA4,
-  TC1_CHB4,
-  TC1_CHA5,
-  TC1_CHB5,
-  TC2_CHA6,
-  TC2_CHB6,
-  TC2_CHA7,
-  TC2_CHB7,
-  TC2_CHA8,
-  TC2_CHB8
-} ETCChannel ;
-
-// * Pin Attributes to be OR-ed
-
-#define PIN_ATTR_COMBO         (1UL<<0)
-#define PIN_ATTR_ANALOG        (1UL<<1)
-#define PIN_ATTR_DIGITAL       (1UL<<2)
-#define PIN_ATTR_PWM           (1UL<<3)
-#define PIN_ATTR_TIMER         (1UL<<4)
-*/
-
 
 #ifdef __cplusplus
 } // extern "C"
@@ -167,6 +112,10 @@ typedef enum _ETCChannel
 #include "WInterrupts.h"
 
 #include "uty_mqx.h"
+
+// delayMicroseconds() and micros() function are powered by hw_timer1
+#define MICRO_SEC_BY_HWTIMER1
+
 
 /*
 // USB Device

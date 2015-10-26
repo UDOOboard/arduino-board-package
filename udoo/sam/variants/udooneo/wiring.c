@@ -54,7 +54,11 @@ uint64_t millis( void )
 
 uint32_t micros( void )
 {
+#ifdef	MICRO_SEC_BY_HWTIMER1
+	return (mqx_hwtimer_get_us());
+#else
 	return (_time_get_microseconds());
+#endif
 }
 
 // This delay function blocks all other tasks !!!
@@ -86,6 +90,22 @@ void delayMicroseconds(uint32_t usec){
 }
 */
 
+#ifdef	MICRO_SEC_BY_HWTIMER1
+void delayMicroseconds(uint32_t usec){
+
+	uint32_t start_us, end_us, elapsed_us;
+
+	start_us = micros();
+	elapsed_us = 0;
+	while (elapsed_us < usec)
+	{
+		end_us = micros();
+		if (end_us > start_us)
+			elapsed_us += (end_us - start_us);
+		start_us = end_us;
+	}
+}
+#else
 void delayMicroseconds(uint32_t usec){
 
 	uint32_t start_us, end_us, elapsed_us;
@@ -100,6 +120,7 @@ void delayMicroseconds(uint32_t usec){
 		start_us = end_us;
 	}
 }
+#endif
 
 #ifdef __cplusplus
 }
