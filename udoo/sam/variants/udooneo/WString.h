@@ -79,6 +79,7 @@ public:
 	// invalid string (i.e., "if (s)" will be true afterwards)
 	unsigned char reserve(unsigned int size);
 	inline unsigned int length(void) const {return len;}
+	inline unsigned int GetCapacity(void) const {return capacity;}
 
 	// creates a copy of the assigned value.  if the value is null or
 	// invalid, or if the memory allocation fails, the string will be 

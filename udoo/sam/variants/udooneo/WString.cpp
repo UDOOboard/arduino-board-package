@@ -23,6 +23,8 @@
 #include "itoa.h"
 #include "avr/dtostrf.h"
 
+#define STRING_STACK_SIZE	255
+
 /*********************************************/
 /*  Constructors                             */
 /*********************************************/
@@ -129,17 +131,16 @@ String::~String()
 /*********************************************/
 /*  Memory Management                        */
 /*********************************************/
-
 inline void String::init(void)
 {
-	//buffer = NULL;
-	//capacity = 0;
+	buffer = NULL;
+	capacity = 0;
 	len = 0;
 
-	// do preallocation otherwise dynamic allocation will crash M4 !!!!!!!
-	buffer = (char*) malloc (256);
-	buffer[0] = 0;
-	capacity = 255;
+	buffer = (char *)malloc(STRING_STACK_SIZE+1);
+	if (buffer) {
+		capacity = STRING_STACK_SIZE;
+	}
 }
 
 void String::invalidate(void)
@@ -152,18 +153,18 @@ void String::invalidate(void)
 unsigned char String::reserve(unsigned int size)
 {
 	if (buffer && capacity >= size) return 1;
-	return (0);
-
-	if (changeBuffer(size)) {
-		if (len == 0) buffer[0] = 0;
-		return 1;
+	if (buffer == NULL) {
+		if (changeBuffer(size)) {
+			if (len == 0) buffer[0] = 0;
+			return 1;
+		}
 	}
 	return 0;
 }
 
 unsigned char String::changeBuffer(unsigned int maxStrLen)
 {
-	char *newbuffer = (char *)realloc(buffer, maxStrLen + 1);
+	char *newbuffer = (char *)malloc(maxStrLen + 1);
 	if (newbuffer) {
 		buffer = newbuffer;
 		capacity = maxStrLen;
@@ -627,7 +628,7 @@ String String::substring(unsigned int left, unsigned int right) const
 		right = left;
 		left = temp;
 	}
-	String out="";
+	String out;
 	if (left >= len) return out;
 	if (right > len) right = len;
 	char temp = buffer[right];  // save the replaced character
