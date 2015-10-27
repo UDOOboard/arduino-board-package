@@ -122,7 +122,7 @@ void mqx_uartclass_init (const uint32_t dwBaudRate, const uint32_t modeReg)
 	bool f=FALSE;
 	int32_t bb;
 
-	printf ("Serial.begin log....... ... \r");
+	printf ("Serial0.begin log....... ... \r");
 
 	r = ioctl(serial_dev,IO_IOCTL_SERIAL_DISABLE_RX, &f);
 	printf("IO_IOCTL_SERIAL_DISABLE_RX=%ld\n", r);
@@ -197,7 +197,7 @@ int32_t mqx_uartclass_read (void)
 
 struct UARTClass;
 void call_irq_handler (struct UARTClass* , uint8_t);
-extern struct UARTClass Serial;
+extern struct UARTClass Serial0;
 
 void mqx_uart_receive_task (uint32_t initial_data)
 {
@@ -212,7 +212,7 @@ void mqx_uart_receive_task (uint32_t initial_data)
 
     	int32_t res = read(serial_dev, &rxData, 1);
     	printf("received char [%c]\n", rxData);
-    	call_irq_handler(&Serial, rxData);
+    	call_irq_handler(&Serial0, rxData);
 
     	/*
     	testCounter++;

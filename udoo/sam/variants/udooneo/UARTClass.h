@@ -68,7 +68,7 @@ class UARTClass : public HardwareSerial
     RingBuffer *_tx_buffer;
 };
 
+extern UARTClass Serial0;
 extern UARTClass Serial;
-extern UARTClass SerialDebug;
 
 #endif // _UART_CLASS_

@@ -153,8 +153,8 @@ void UARTClass::IrqHandler(uint8_t rxChar) {
  */
 RingBuffer rx_buffer1;
 RingBuffer rx_buffer2;
-UARTClass Serial(&rx_buffer1, NULL);
-UARTClass SerialDebug(&rx_buffer2, NULL, true);
+UARTClass Serial0(&rx_buffer1, NULL);
+UARTClass Serial(&rx_buffer2, NULL, true);
 
 extern "C" {
 	void call_irq_handler (UARTClass* ptr, uint8_t rxChar) {

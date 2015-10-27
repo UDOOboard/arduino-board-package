@@ -130,7 +130,7 @@ int32_t mqx_uartclass_write_buffer_mcc (const uint8_t *ptr, uint16_t len)
 #ifdef ARDUINO_SERIAL_DEBUG_RX
 struct UARTClass;
 void call_irq_handler (struct UARTClass* , uint8_t);
-extern struct UARTClass SerialDebug;
+extern struct UARTClass Serial;
 
 void mqx_mccuart_receive_task (uint32_t initial_data)
 {
@@ -162,7 +162,7 @@ void mqx_mccuart_receive_task (uint32_t initial_data)
         if(MCC_SUCCESS == ret_value) {
             printf("MCC received a msg from A9 [%i,%i,%i] endpoint  len=%d\n", mqx_endpoint_a9.core, mqx_endpoint_a9.node, mqx_endpoint_a9.port, num_of_received_bytes);
         	for (cnt=0; cnt<num_of_received_bytes; cnt++) {
-            	call_irq_handler(&SerialDebug, msg.DATA[cnt]);
+            	call_irq_handler(&Serial, msg.DATA[cnt]);
         	}
         }
 
