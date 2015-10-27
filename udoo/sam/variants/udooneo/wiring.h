@@ -27,16 +27,13 @@ extern "C" {
 #include <mqx.h>
 //#include <bsp.h>
 
-/**
- *
- */
 extern void initVariant( void ) ;
 extern void init( void ) ;
 
-// return millisec since the udoo-neo board began runnig the program
-extern uint64_t millis( void ) ;
+// return millisec since udoo-neo begin to run the program
+extern uint32_t millis( void ) ;
 
-// return mocrosec
+// return microsec
 // This number will overflow every ????
 extern uint32_t micros( void ) ;
 

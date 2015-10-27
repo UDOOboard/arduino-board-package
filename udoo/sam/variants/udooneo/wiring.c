@@ -45,7 +45,7 @@ uint32_t millis( void )
 }
 */
 
-uint64_t millis( void )
+uint32_t millis( void )
 {
 	TIME_STRUCT time;
 
