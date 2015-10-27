@@ -38,7 +38,7 @@ extern void mqx_uart_receive_task(uint32_t);
 static void arduino_loop_task(uint32_t);
 static void arduino_yield_task (uint32_t);
 static void test_task (uint32_t);
-static void mqx_receive_task_mcc (uint32_t);
+extern void mqx_mccuart_receive_task (uint32_t);
 
 //#define USER_TASK_ENABLED
 #ifdef USER_TASK_ENABLED
@@ -48,6 +48,7 @@ static void arduino_user_task3 (uint32_t);
 #endif
 
 //#define MQX_LOG_TT
+#define ARDUINO_SERIAL_DEBUG_RX
 
 // ----------------------------------------------------------------------------------------------
 // if a task with high priority make a loop without delay or other wait,
@@ -61,7 +62,9 @@ const TASK_TEMPLATE_STRUCT  MQX_template_list[] =
     { 3,			mqx_uart_receive_task,	1500,	9,			"uartrx",			0,						0,     0 },
     { 4,			arduino_yield_task,		1500,	9,			"arduino_yield",	0,						0,     0 },
     { 5,			test_task,				1500,	9,			"test",				0,						0,     0 },
-//    { 6,			mqx_receive_task_mcc,	1500,	9,			"mccrx",			0,						0,     0 },
+#ifdef ARDUINO_SERIAL_DEBUG_RX
+    { 6,			mqx_mccuart_receive_task,	1500,	9,			"mccrx",			0,						0,     0 },
+#endif
 #ifdef USER_TASK_ENABLED
     { 7,			arduino_user_task1,		1500,	9,			"user_task1",		0,						0,     0 },
     { 8,			arduino_user_task2,		1500,	9,			"user_task2",		0,						0,     0 },

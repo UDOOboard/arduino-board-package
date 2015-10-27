@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2011 Arduino.  All right reserved.
+  Copyright (c) 2014 Arduino.  All right reserved.
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
@@ -8,7 +8,7 @@
 
   This library is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
   See the GNU Lesser General Public License for more details.
 
   You should have received a copy of the GNU Lesser General Public
@@ -16,27 +16,21 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#include "variant.h"
+#include <stdlib.h>
 
-
-// ----------------------------------------------------------------------------
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-extern void AdcBegin(void);
-void init_hwtimer1 (void);
-
-void init( void )
-{
-
-	AdcBegin();
-#ifdef	MICRO_SEC_BY_HWTIMER1
-	init_hwtimer1 ();
-#endif
+void *operator new(size_t size) {
+  return malloc(size);
 }
 
-#ifdef __cplusplus
+void *operator new[](size_t size) {
+  return malloc(size);
 }
-#endif
+
+void operator delete(void * ptr) {
+  free(ptr);
+}
+
+void operator delete[](void * ptr) {
+  free(ptr);
+}
+

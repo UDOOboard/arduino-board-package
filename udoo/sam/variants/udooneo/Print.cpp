@@ -20,7 +20,7 @@
  */
 
 #include <stdlib.h>
-//#include <stdio.h>
+#include <stdio.h>
 #include <string.h>
 #include <math.h>
 #include "Arduino.h"
@@ -38,6 +38,8 @@ extern "C" {
 size_t Print::write(const uint8_t *buffer, size_t size)
 {
 	int32_t n = 0;
+
+	if (size == 0) return (n);
 
 	if (!is_mcc)
 		n = mqx_uartclass_write_buffer (buffer, size);

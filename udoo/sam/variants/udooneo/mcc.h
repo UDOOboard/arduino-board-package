@@ -31,20 +31,28 @@
 #define RESPONDER_TTN          (11)
 
 // for pingpong test
-#define MCC_MQX_NODE_A5        (0)
-#define MCC_MQX_NODE_M4        (0)
-#define MCC_MQX_SENDER_PORT    (1)
-#define MCC_MQX_RESPONDER_PORT (2)
+//#define MCC_MQX_NODE_A5        (0)
+//#define MCC_MQX_NODE_M4        (0)
+//#define MCC_MQX_SENDER_PORT    (1)
+//#define MCC_MQX_RESPONDER_PORT (2)
 
 // for arduino serial debug
-#define MCC_MQX_NODE_A9        	(0)
-#define MCC_MQX_PORT_A9			(1)
-#define MCC_MQX_NODE_M4        	(0)
-#define MCC_MQX_PORT_M4			(1)
+//#define MCC_MQX_NODE_A9        	(0)
+//#define MCC_MQX_PORT_A9			(1)
+//#define MCC_MQX_NODE_M4        	(0)
+//#define MCC_MQX_PORT_M4			(1)
 
+// mcctty
+#define MCC_NODE_A9        	(0)
+#define MCC_PORT_A9			(1)
+#define MCC_NODE_M4        	(0)
+#define MCC_PORT_M4			(2)
+
+/*
 typedef struct the_message
 {
    uint32_t  DATA;
 } THE_MESSAGE, * THE_MESSAGE_PTR;
+*/
 
 #endif

@@ -74,18 +74,10 @@ const DioPinMap arduinoToMqx_Pin[ARD_NMAX_DIO] = {
 
 LWGPIO_STRUCT ardDio[ARD_NMAX_DIO];
 
-
-/*
-ulPin ArduinoToMqx_Pin (uint32_t ulPin)
-{
-}
-*/
-
 extern void pinMode( uint32_t ulPin, uint32_t ulMode )
 {
 
 	if (ulPin >= ARD_NMAX_DIO) return;
-	//FRANCESCO if ( g_APinDescription[ulPin].ulPinType == PIO_NOT_A_PIN )
 	switch (ulMode)
     {
         case INPUT:
@@ -135,8 +127,6 @@ extern void pinMode( uint32_t ulPin, uint32_t ulMode )
 
 extern void digitalWrite( uint32_t ulPin, uint32_t ulVal )
 {
-	//FRANCESCO if ( g_APinDescription[ulPin].ulPinType == PIO_NOT_A_PIN ) return;
-
 	if (ulPin >= ARD_NMAX_DIO) return;
 	/* write logical 1 to the pin */
 	lwgpio_set_value(&ardDio[ulPin], ulVal); /* set pin to 1 */
@@ -144,8 +134,6 @@ extern void digitalWrite( uint32_t ulPin, uint32_t ulVal )
 
 extern int digitalRead( uint32_t ulPin )
 {
-
-	//if ( g_APinDescription[ulPin].ulPinType == PIO_NOT_A_PIN ) return;
 
 	if (ulPin >= ARD_NMAX_DIO) return (LOW);
     if (LWGPIO_VALUE_HIGH == lwgpio_get_value(&ardDio[ulPin]))

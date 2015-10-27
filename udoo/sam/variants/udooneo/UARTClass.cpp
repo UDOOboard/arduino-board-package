@@ -26,6 +26,10 @@ extern "C" {
 #include "UART_mqx_mcc.h"
 }
 
+#include "uty_mqx.h"
+
+#define ARDUINO_SERIAL_DEBUG_RX
+
 // Constructors ////////////////////////////////////////////////////////////////
 UARTClass::UARTClass(RingBuffer *pRx_buffer, RingBuffer *pTx_buffer, bool mcc) {
 	_rx_buffer = pRx_buffer;
@@ -91,7 +95,9 @@ int UARTClass::availableForWrite(void) {
 
 int UARTClass::peek(void) {
 
+#ifndef ARDUINO_SERIAL_DEBUG_RX
 	if (is_mcc) return (0);
+#endif
 
 	if (_rx_buffer->_iHead == _rx_buffer->_iTail)
 		return -1;
@@ -101,8 +107,10 @@ int UARTClass::peek(void) {
 
 int UARTClass::read(void) {
 
+#ifndef ARDUINO_SERIAL_DEBUG_RX
 	if (is_mcc) return (0);
-//	return (mqx_uartclass_read());
+#endif
+
 	// if the head isn't ahead of the tail, we don't have any characters
 	if (_rx_buffer->_iHead == _rx_buffer->_iTail)
 		return -1;
@@ -144,19 +152,9 @@ void UARTClass::IrqHandler(uint8_t rxChar) {
  * UART objects
  */
 RingBuffer rx_buffer1;
+RingBuffer rx_buffer2;
 UARTClass Serial(&rx_buffer1, NULL);
-UARTClass SerialDebug(NULL, NULL, true);
-
-/*
-void serialEvent() __attribute__((weak));
-void serialEvent() { }
-// ----------------------------------------------------------------------------
-
-void serialEventRun(void)
-{
-  if (Serial.available()) serialEvent();
-}
-*/
+UARTClass SerialDebug(&rx_buffer2, NULL, true);
 
 extern "C" {
 	void call_irq_handler (UARTClass* ptr, uint8_t rxChar) {

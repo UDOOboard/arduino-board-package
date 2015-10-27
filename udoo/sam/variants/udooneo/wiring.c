@@ -17,6 +17,7 @@
 */
 
 #include "Arduino.h"
+#include "hwtimer_mqx.h"
 
 #ifdef __cplusplus
 extern "C" {

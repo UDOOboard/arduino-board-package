@@ -53,6 +53,7 @@ typedef uint32_t prog_uint32_t;
 #define strlen_P(a) strlen((a))
 #define sprintf_P(s, f, ...) sprintf((s), (f), __VA_ARGS__)
 
+/*
 #define pgm_read_byte(addr) (*(const unsigned char *)(addr))
 #define pgm_read_word(addr) (*(const unsigned short *)(addr))
 #define pgm_read_dword(addr) (*(const unsigned long *)(addr))
@@ -66,5 +67,5 @@ typedef uint32_t prog_uint32_t;
 #define pgm_read_word_far(addr) pgm_read_word(addr)
 #define pgm_read_dword_far(addr) pgm_read_dword(addr)
 #define pgm_read_float_far(addr) pgm_read_float(addr)
-
+*/
 #endif

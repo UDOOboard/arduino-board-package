@@ -38,15 +38,21 @@
 #error This application requires BSPCFG_ENABLE_IO_SUBSYSTEM defined non-zero in user_config.h. Please recompile BSP with this option.
 #endif
 
-//#define ARDUINO_SERIAL_DEBUG_RX
+#define ARDUINO_SERIAL_DEBUG_RX
+
 #define NODE_NUM			0ul
 #define MCC_SEND_TIMEOUT	1000ul
-static MCC_ENDPOINT    mqx_endpoint_m4 = {1,MCC_MQX_NODE_M4,MCC_MQX_PORT_M4};
-static MCC_ENDPOINT    mqx_endpoint_a9 = {0,MCC_MQX_NODE_A9,MCC_MQX_PORT_A9};
+static MCC_ENDPOINT    mqx_endpoint_m4 = {1,MCC_NODE_M4,MCC_PORT_M4};
+static MCC_ENDPOINT    mqx_endpoint_a9 = {0,MCC_NODE_A9,MCC_PORT_A9};
 static bool mccIsInitialized = FALSE;
 #ifdef ARDUINO_SERIAL_DEBUG_RX
 static _task_id serial_task_id_mcc = MQX_NULL_TASK_ID;
 #endif
+
+typedef struct mcc_uart_message
+{
+   uint8_t  DATA[MCC_ATTR_BUFFER_SIZE_IN_BYTES-24];
+} MCC_UART_MESSAGE;
 
 void mqx_uartclass_init_mcc (void)
 {
@@ -61,7 +67,7 @@ void mqx_uartclass_init_mcc (void)
 
     //ret_value = mcc_get_info(node_num, &mcc_info);
 
-    ret_value = mcc_create_endpoint(&mqx_endpoint_m4, MCC_MQX_PORT_M4);
+    ret_value = mcc_create_endpoint(&mqx_endpoint_m4, MCC_PORT_M4);
     mccIsInitialized = TRUE;
 
 #ifdef ARDUINO_SERIAL_DEBUG_RX
@@ -126,21 +132,40 @@ struct UARTClass;
 void call_irq_handler (struct UARTClass* , uint8_t);
 extern struct UARTClass SerialDebug;
 
-void mqx_receive_task_mcc (uint32_t initial_data)
+void mqx_mccuart_receive_task (uint32_t initial_data)
 {
-	uint8_t rxData;
+	int32_t ret_value;
+	MCC_MEM_SIZE num_of_received_bytes, cnt;
+	MCC_UART_MESSAGE msg;
 
-//	_time_delay(5000);		// start after initialization from arduino main is made
-	printf("mqx_receive_task_mcc is running!!\n");
+	printf("mqx_mccuart_receive_task is running!!\n");
 
 	uint32_t testCounter = 0;
 
     while (TRUE)  {
+
+
+        ret_value = mcc_recv(&mqx_endpoint_a9, &mqx_endpoint_m4, &msg, sizeof(MCC_UART_MESSAGE), &num_of_received_bytes, 0xffffffff);
 /*
-    	int32_t res = read(serial_dev, &rxData, 1);
-    	printf("received char [%c]\n", rxData);
-    	call_irq_handler(&SerialDebug, rxData);
+        if(MCC_SUCCESS != ret_value) {
+            printf("Responder task receive error: %i\n", ret_value);
+        } else {
+            printf("Responder task received a msg from [%i,%i,%i] endpoint\n", mqx_endpoint_a9.core, mqx_endpoint_a9.node, mqx_endpoint_a9.port);
+            printf("Message: Size=%x, DATA = \"%s\"\n", num_of_received_bytes, testBuffer);
+            ret_value = mcc_send(&mqx_endpoint_m4, &mqx_endpoint_a9, &testBuffer, sizeof(testBuffer), 0xffffffff);
+            if(MCC_SUCCESS != ret_value) {
+                printf("\nError, sending the message using the send function failed");
+            }
+        }
 */
+
+        if(MCC_SUCCESS == ret_value) {
+            printf("MCC received a msg from A9 [%i,%i,%i] endpoint  len=%d\n", mqx_endpoint_a9.core, mqx_endpoint_a9.node, mqx_endpoint_a9.port, num_of_received_bytes);
+        	for (cnt=0; cnt<num_of_received_bytes; cnt++) {
+            	call_irq_handler(&SerialDebug, msg.DATA[cnt]);
+        	}
+        }
+
     	/*
     	testCounter++;
     	printf("testCounterRxTask=%d\n", testCounter);

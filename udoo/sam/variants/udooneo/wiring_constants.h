@@ -48,7 +48,7 @@ enum BitOrder {
 	MSBFIRST = 1
 };
 
-#define CHANGE 2
+//#define CHANGE 2, not implemented
 #define FALLING 3
 #define RISING 4
 

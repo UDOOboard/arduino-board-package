@@ -16,13 +16,10 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#include <mqx.h>
-#include <bsp.h>
-
 #include "Arduino.h"
 #include "wiring_private.h"
 #include "log_mqx.h"
-
+#include "lwgpio_igpio.h"
 /*
   Copyright (c) 2011-2012 Arduino.  All right reserved.
 

@@ -132,9 +132,14 @@ String::~String()
 
 inline void String::init(void)
 {
-	buffer = NULL;
-	capacity = 0;
+	//buffer = NULL;
+	//capacity = 0;
 	len = 0;
+
+	// do preallocation otherwise dynamic allocation will crash M4 !!!!!!!
+	buffer = (char*) malloc (256);
+	buffer[0] = 0;
+	capacity = 255;
 }
 
 void String::invalidate(void)
@@ -147,6 +152,8 @@ void String::invalidate(void)
 unsigned char String::reserve(unsigned int size)
 {
 	if (buffer && capacity >= size) return 1;
+	return (0);
+
 	if (changeBuffer(size)) {
 		if (len == 0) buffer[0] = 0;
 		return 1;
@@ -620,7 +627,7 @@ String String::substring(unsigned int left, unsigned int right) const
 		right = left;
 		left = temp;
 	}
-	String out;
+	String out="";
 	if (left >= len) return out;
 	if (right > len) right = len;
 	char temp = buffer[right];  // save the replaced character

@@ -34,9 +34,9 @@ int Stream::timedRead()
   int c;
   _startMillis = millis();
   do {
-	  mqx_sched_yield();
 	  c = read();
 	  if (c >= 0) return c;
+	  mqx_sched_yield();
   } while(millis() - _startMillis < _timeout);
 
   return -1;     // -1 indicates timeout
@@ -49,10 +49,10 @@ int Stream::timedPeek()
 
   _startMillis = millis();
   do {
-	  mqx_sched_yield();
 	  c = peek();
 //    mqx_debug_int (2, c);
 	  if (c >= 0) return c;
+	  mqx_sched_yield();
   } while(millis() - _startMillis < _timeout);
 
   return -1;     // -1 indicates timeout
@@ -236,7 +236,7 @@ size_t Stream::readBytesUntil(char terminator, char *buffer, size_t length)
 
 String Stream::readString()
 {
-  String ret;
+  String ret="";
   int c = timedRead();
   while (c >= 0)
   {
@@ -248,7 +248,7 @@ String Stream::readString()
 
 String Stream::readStringUntil(char terminator)
 {
-  String ret;
+  String ret="";
   int c = timedRead();
   while (c >= 0 && c != terminator)
   {

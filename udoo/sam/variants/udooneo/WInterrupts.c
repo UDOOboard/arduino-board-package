@@ -24,7 +24,7 @@
 typedef void (*interruptCB)(void *);
 
 extern LWGPIO_STRUCT ardDio[ARD_NMAX_DIO];
-//extern const DioPinMap arduinoToMqx_Pin[ARD_NMAX_DIO];
+
 static interruptCB int_service_routine_ard_pin[ARD_NMAX_DIO];
 static void (*callback_ard_pin[ARD_NMAX_DIO])(void);
 
@@ -123,7 +123,7 @@ void attachInterrupt(uint32_t pin, void (*callback)(void), uint32_t mode)
 	case HIGH: intMode = LWGPIO_INT_MODE_HIGH;break;
 	case FALLING: intMode = LWGPIO_INT_MODE_FALLING;break;
 	case RISING: intMode = LWGPIO_INT_MODE_RISING;break;
-	//case CHANGE: intMode = ;
+	//case CHANGE:
 	}
 
 	if (pin >= ARD_NMAX_DIO) return;
@@ -131,7 +131,7 @@ void attachInterrupt(uint32_t pin, void (*callback)(void), uint32_t mode)
 		__initialize();
 		enabled = 1;
 	}
-	printf("attachInterrupt() pin=%d  mode=%d\n", pin, mode);
+	//printf("attachInterrupt() pin=%d  mode=%d\n", pin, mode);
 
 /* //configured in pinmode()
 // opening pins for input
@@ -164,6 +164,7 @@ if (!lwgpio_init(&ardDio[pin], arduinoToMqx_Pin[pin].pin, LWGPIO_DIR_INPUT, LWGP
 	callback_ard_pin[pin] = callback;
 
     /* enable interrupt on GPIO peripheral module */
+    lwgpio_int_clear_flag(&ardDio[pin]);
     lwgpio_int_enable(&ardDio[pin], TRUE);
 }
 

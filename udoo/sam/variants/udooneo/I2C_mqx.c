@@ -190,5 +190,6 @@ int32_t mqx_towire_setClock(uint8_t i2cId, uint32_t fr) {
 	_mqx_int result = I2C_OK;
 
 	result = ioctl (i2c_fd[i2cId], IO_IOCTL_I2C_SET_BAUD, &fr);
-}
 
+	return (result);
+}
