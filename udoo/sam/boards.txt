@@ -1,0 +1,23 @@
+
+udooqdl.name=UDOO QDL (Arduino Due)
+udooqdl.vid.0=0x2341
+udooqdl.pid.0=0x003d
+udooqdl.vid.1=0x2A03
+udooqdl.pid.1=0x003d
+udooqdl.upload.tool=bossac
+udooqdl.upload.protocol=sam-ba
+udooqdl.upload.maximum_size=524288
+udooqdl.upload.use_1200bps_touch=true
+udooqdl.upload.wait_for_upload_port=false
+udooqdl.upload.native_usb=false
+udooqdl.build.mcu=cortex-m3
+udooqdl.build.f_cpu=84000000L
+udooqdl.build.usb_product="Arduino Due"
+udooqdl.build.board=SAM_DUE
+udooqdl.build.core=arduino
+udooqdl.build.extra_flags=-D__SAM3X8E__ -mthumb {build.usb_flags}
+udooqdl.build.ldscript=linker_scripts/gcc/flash.ld
+udooqdl.build.variant=arduino_due_x
+udooqdl.build.variant_system_lib=libsam_sam3x8e_gcc_rel.a
+udooqdl.build.vid=0x2341
+udooqdl.build.pid=0x003e
