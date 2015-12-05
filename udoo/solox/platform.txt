@@ -5,7 +5,7 @@
 # For more info:
 # https://github.com/arduino/Arduino/wiki/Arduino-IDE-1.5---3rd-party-Hardware-specification
 
-name=UDOO Boards 
+name=UDOO NEO (iMX6 SoloX)
 version=1.6.5
 
 # M4 compile variables
@@ -92,9 +92,15 @@ recipe.size.regex=\.text\s+([0-9]+).*
 # M4 Uploader tools 
 # -------------------
 
+tools.udooclient.path={runtime.tools.udooclient.path}/bin
+tools.udooclient.cmd=udooclient
+tools.udooclient.cmd.windows=udooclient.exe
+tools.udooclient.upload.params.verbose=-v
+tools.udooclient.upload.params.quiet=-q
+tools.udooclient.upload.pattern="{path}/{cmd}" "192.168.7.2:5152" "{build.path}/{build.project_name}.bin"
+
 tools.m4uploader.path=/usr/bin
 tools.m4uploader.cmd=udooneo-m4uploader
-tools.m4uploader.cmd.windows=m4test.sh
 tools.m4uploader.upload.params.verbose=-v
 tools.m4uploader.upload.params.quiet=-q
 tools.m4uploader.upload.pattern="{path}/{cmd}" "{build.path}/{build.project_name}.bin"
