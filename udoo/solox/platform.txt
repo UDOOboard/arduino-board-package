@@ -17,7 +17,7 @@ compiler.warning_flags.default=
 compiler.warning_flags.more=-Wall
 compiler.warning_flags.all=-Wall -Wextra
 
-compiler.path=/usr/bin/
+compiler.path={runtime.tools.gcc-arm-none-eabi.path}/bin/
 compiler.c.cmd=arm-none-eabi-gcc
 compiler.c.flags={compiler.warning_flags} -mcpu=cortex-m4 -march=armv7e-m -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16 -Os -fmessage-length=0 -ffunction-sections -fdata-sections  -g -D_AEABI_LC_CTYPE=C -D__STRICT_ANSI__=1 -std=gnu11 -MMD -MP -c
 # Note: -fno-rtti allows to libsupc++ to be not included, resulting in a
@@ -92,7 +92,7 @@ recipe.size.regex=\.text\s+([0-9]+).*
 # M4 Uploader tools 
 # -------------------
 
-tools.udooclient.path={runtime.tools.udooclient.path}/bin
+tools.udooclient.path={runtime.tools.udooclient.path}
 tools.udooclient.cmd=udooclient
 tools.udooclient.cmd.windows=udooclient.exe
 tools.udooclient.upload.params.verbose=-v
