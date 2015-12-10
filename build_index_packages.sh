@@ -202,8 +202,8 @@ fi
 
 # clean build dir
 cd $REPO_DIR
-# rm -r build
-# mkdir build
+rm -rf build
+mkdir build
 
 GREEN="\e[32m"
 RED="\e[31m"
