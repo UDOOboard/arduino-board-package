@@ -1,4 +1,4 @@
-#!/usr/bin/bash
+#!/bin/bash
 # 
 # build_index_packages.sh
 # Builds packages and index file for Arduino IDE
