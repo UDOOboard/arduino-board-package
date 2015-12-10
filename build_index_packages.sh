@@ -365,7 +365,9 @@ EOF
 
       #get sha and size
       shasize $PACKAGENAME PACKAGESHA PACKAGESIZE
-      
+      #don't need it anymore
+      rm $PACKAGENAME
+
       cat >> $PACKAGE_INDEX_FILE <<EOF 
       $comma{
         "host":"$host",
