@@ -35,7 +35,7 @@ PACKAGE_INDEX_FILE=`mktemp`
 _PACKAGE_INDEX_FILE="$REPO_DIR/build/package_udoo_index.json"
 
 # boards are served via github pages
-BOARD_DOWNLOAD_URL="https://udooboard.github.io/arduino-boards-packages/"
+BOARD_DOWNLOAD_URL="https://udooboard.github.io/arduino-board-package"
 
 declare -a ARCHS
 ARCHS=( qdl neo )
