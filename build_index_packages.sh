@@ -110,7 +110,7 @@ ARCHS_PKG[neo]="$JSON"
 
 read -r -d '' JSON <<EOF
          {
-          "name":"UDOO QDL (Arduino Due)",
+          "name":"UDOO QUAD/DUAL (Arduino Due)",
           "architecture":"sam",
           "version":"PACKAGEVERSION",
           "category":"Contributed",
@@ -122,7 +122,7 @@ read -r -d '' JSON <<EOF
             "online":"https://www.udoo.org"
           },
           "boards":[
-            { "name":"UDOO QDL (Arduino Due)" }
+            { "name":"UDOO QUAD/DUAL (Arduino Due)" }
           ],
           "toolsDependencies":[
             {
