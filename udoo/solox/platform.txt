@@ -36,16 +36,16 @@ compiler.elf2hex.flags=-O binary
 compiler.elf2hex.cmd=arm-none-eabi-objcopy
 compiler.ldflags=
 compiler.size.cmd=arm-none-eabi-size
-compiler.define=-DARDUINO=
+compiler.define=-DARDUINO=123456
 
 # this can be overriden in boards.txt
 build.extra_flags=
 #-DMQX_LOG -DMQX_EXTRA_LOG
 
 # These can be overridden in platform.local.txt
-compiler.c.extra_flags="-I{build.variant.path}/mqx/release/bsp" "-I{build.variant.path}/mqx/release/bsp/Sources" "-I{build.variant.path}/mqx/release" "-I{build.variant.path}/mqx/release/psp" "-I{build.variant.path}/mqx/release/mcc"
+compiler.c.extra_flags="-I{build.variant.path}/mqx/release/bsp" "-I{build.variant.path}/mqx/release/bsp/Sources" "-I{build.variant.path}/mqx/release" "-I{build.variant.path}/mqx/release/psp" "-I{build.variant.path}/mqx/release/mcc" "{compiler.define}"
 compiler.c.elf.extra_flags="-T{build.variant.path}/linker_scripts/gcc/libs.ld" 
-compiler.cpp.extra_flags="-I{build.variant.path}/mqx/release/bsp" "-I{build.variant.path}/mqx/release/bsp/Sources" "-I{build.variant.path}/mqx/release" "-I{build.variant.path}/mqx/release/psp" "-I{build.variant.path}/mqx/release/mcc"
+compiler.cpp.extra_flags="-I{build.variant.path}/mqx/release/bsp" "-I{build.variant.path}/mqx/release/bsp/Sources" "-I{build.variant.path}/mqx/release" "-I{build.variant.path}/mqx/release/psp" "-I{build.variant.path}/mqx/release/mcc" "{compiler.define}"
 compiler.ar.extra_flags=
 compiler.elf2hex.extra_flags=
 compiler.libsam.c.flags=
