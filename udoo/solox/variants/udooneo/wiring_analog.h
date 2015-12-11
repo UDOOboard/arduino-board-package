@@ -19,11 +19,14 @@
 #ifndef _WIRING_ANALOG_
 #define _WIRING_ANALOG_
 
+#define ADC_HW_RESOLUTION	12
+
+#define ANALOG_WRITE_HIGHEST_NUMBER_PIN			11
+extern const uint8_t ardPinToPwmChn[ANALOG_WRITE_HIGHEST_NUMBER_PIN+1];
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#define ADC_RESOLUTION	12
 
 /*
  * \brief SAM3 products have only one reference for ADC

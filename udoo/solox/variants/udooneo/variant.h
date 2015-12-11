@@ -40,8 +40,8 @@
 
 #ifdef __cplusplus
 
+extern UARTClass Serial0;
 extern UARTClass Serial;
-extern UARTClass SerialDebug;
 
 #endif
 

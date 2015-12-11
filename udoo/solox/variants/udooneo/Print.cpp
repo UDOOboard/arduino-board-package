@@ -27,10 +27,8 @@
 
 #include "Print.h"
 
-extern "C" {
 #include "UART_mqx.h"
 #include "UART_mqx_mcc.h"
-}
 
 // Public Methods //////////////////////////////////////////////////////////////
 

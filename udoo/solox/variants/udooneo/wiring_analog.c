@@ -42,10 +42,20 @@ extern "C" {
 #endif
 
 // PWM
-#define NMAX_ARD_ANALOG_OUT_PIN			11
+
+// the parameters setting below for:
+//     1 kHz pwm frequency
+//     24000 ticks pwm resolution
+// for different setting read IMX6SXRM.pdf 49.7.5
+
+#define DEF_PWM_FWM							3			// default FIFO watermark
+#define DEF_PWM_PRESCALER					0			// default prescaler
+#define DEF_PWM_ACT_POL						0			// default active polarity: 0 set at rollover, 1 clear at rollover
+#define DEF_PWM_TICKS_PERIOD				(24000-2)	// default pwm period
+#define DEF_PWM_REPEAT						1			// default repeat
 
 // mapping arduino pins to pwm channels
-const uint8_t ardPinToPwmChn[NMAX_ARD_ANALOG_OUT_PIN+1] = {255, 255, 255, PWM_CH0, PWM_CH1, PWM_CH2, PWM_CH3, PWM_CH4, 255, PWM_CH5, PWM_CH7, PWM_CH6};
+const uint8_t ardPinToPwmChn[ANALOG_WRITE_HIGHEST_NUMBER_PIN+1] = {255, 255, 255, PWM_CH0, PWM_CH1, PWM_CH2, PWM_CH3, PWM_CH4, 255, PWM_CH5, PWM_CH7, PWM_CH6};
 
 extern const LWADC_INIT_STRUCT BSP_DEFAULT_LWADC_MODULE;
 extern const LWADC_INIT_STRUCT lwadc2_init;
@@ -60,7 +70,7 @@ static LWADC_STRUCT_PTR    lwadc_inputs=NULL;
 
 
 eAnalogReference analog_reference = AR_DEFAULT;
-static int _readResolution = 12;
+static int _readResolution = 10;
 static int _writeResolution = 8;
 
 /* This structure defines the generic ADCs available on this board. The structure will be populated based on
@@ -121,6 +131,18 @@ static inline uint32_t mapResolution(uint32_t value, uint32_t from, uint32_t to)
 		return value << (to-from);
 }
 
+uint32_t mapPwmResolution(uint32_t value, uint32_t from, uint32_t to) {
+
+	if (from == to)
+		return value;
+	if (from > to) {
+		return (uint32_t)((float)value / (float)from / (float)to);
+	}
+	else {
+		return (uint32_t)((float)value * (float)to / (float)from);
+	}
+}
+
 void analogReference(eAnalogReference ulMode)
 {
 	analog_reference = ulMode;
@@ -143,7 +165,7 @@ uint32_t analogRead( uint32_t ulPin )
     }while (!done);
 	_lwadc_read_raw(&lwadc_inputs[ulPin], &raw);
 	printf ("analog pin = %d sensorValue = %d\n", ulPin, raw);
-	normRaw = mapResolution(raw, ADC_RESOLUTION, _readResolution);
+	normRaw = mapResolution(raw, ADC_HW_RESOLUTION, _readResolution);
 
 	return normRaw;
 }
@@ -154,7 +176,7 @@ void analogOutputInit(void) {
 // ulPin matches to arduino pin (3, 4, 5, 6, 7, 9, 10, 11)
 void analogWrite(uint32_t ulPin, uint32_t ulValue) {
 
-	if (ulPin > NMAX_ARD_ANALOG_OUT_PIN) return;
+	if (ulPin > ANALOG_WRITE_HIGHEST_NUMBER_PIN) return;
 	uint16_t pwmChn = ardPinToPwmChn[ulPin];
 	if (pwmChn == 255) return;
 
@@ -162,15 +184,15 @@ void analogWrite(uint32_t ulPin, uint32_t ulValue) {
 		// PWM Startup code
     	_bsp_pwm_io_init(pwmChn, 0xff);
 		pwm_disable(pwmChn);
-
-    	pwm_set_clock(pwmChn, kPwmClockSourceIpg);
-    	pwm_set_fwm(pwmChn, 1);
-    	pwm_set_prescaler(pwmChn, 0);
-    	pwm_set_poutc(pwmChn, 0);
-    	pwm_set_period(pwmChn, 0xfffe);
-    	pwm_set_resolution(pwmChn, 16);
-    	pwm_set_repeat(pwmChn, 1);
+		pwm_set_clock(pwmChn, kPwmClockSourceIpg);
+		pwm_set_fwm(pwmChn, DEF_PWM_FWM);
+		pwm_set_prescaler(pwmChn, DEF_PWM_PRESCALER);
+		pwm_set_poutc(pwmChn, DEF_PWM_ACT_POL);
+		pwm_set_period(pwmChn, DEF_PWM_TICKS_PERIOD);
+		pwm_set_resolution(pwmChn, DEF_PWM_TICKS_PERIOD);
+		pwm_set_repeat(pwmChn, DEF_PWM_REPEAT);
 		pwm_enable(pwmChn);
+
 		/*
 		printf("MY_HW_PWM_PWMPR(%d)=%08X\n", pwmChn, MY_HW_PWM_PWMPR(pwmChn).U);
 		printf("MY_HW_PWM_PWMCR(%d)=%08X\n", pwmChn, MY_HW_PWM_PWMCR(pwmChn).U);
@@ -178,7 +200,7 @@ void analogWrite(uint32_t ulPin, uint32_t ulValue) {
 		*/
 	}
 
-	ulValue = mapResolution(ulValue, _writeResolution, pwm_get_resolution(pwmChn));
+	ulValue = mapPwmResolution(ulValue, (uint32_t)1<<_writeResolution, pwm_get_resolution(pwmChn));
    	pwm_set_sample(pwmChn, (uint16_t)ulValue);
 }
 

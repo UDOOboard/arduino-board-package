@@ -21,10 +21,8 @@
 #include <string.h>
 #include "UARTClass.h"
 
-extern "C" {
 #include "UART_mqx.h"
 #include "UART_mqx_mcc.h"
-}
 
 #include "uty_mqx.h"
 

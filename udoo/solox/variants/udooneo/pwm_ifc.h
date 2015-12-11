@@ -88,7 +88,7 @@ const uint32_t PWM_BASE_REGS[] = {REGS_PWM1_BASE, REGS_PWM2_BASE, REGS_PWM3_BASE
 // PWM
 typedef struct _pwm_setup_struct {
 	uint8_t enabled;
-	uint8_t resolution;
+	uint32_t resolution;
 	uint16_t period;
 } PWM_SETUP_STRUCT;
 
@@ -137,8 +137,8 @@ void pwm_set_repeat(uint16_t instance, uint16_t repeat);
 bool pwm_set_sample(uint16_t instance, uint16_t sample);
 bool pwmIsEnable(uint16_t instance);
 uint16_t pwm_get_period(uint16_t instance);
-void pwm_set_resolution(uint16_t instance, uint16_t bits);
-uint16_t pwm_get_resolution(uint16_t instance);
+void pwm_set_resolution(uint16_t instance, uint32_t value);
+uint32_t pwm_get_resolution(uint16_t instance);
 bool PwmIsEnabled(uint16_t instance);
 
 #if defined(__cplusplus)

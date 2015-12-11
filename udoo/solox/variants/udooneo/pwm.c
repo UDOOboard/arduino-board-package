@@ -34,12 +34,16 @@
 
 #include "pwm_ifc.h"
 
+/*  From IMX6SXRM.pdf 49.7.5
+ *  PWM (Hz) = PCLK (Hz) / (period + 2)
+ *
+ *  PCLK = SRC_CLK / prescaler+1
+ *  SRC_CLK = 24000000 (Hz) when kPwmClockSourceIpg is configured (pwm_set_clock(pwmChn, kPwmClockSourceIpg))
+ *
+*/
+
 #define NMAX_PWMS	8
 static PWM_SETUP_STRUCT pwmSetup[NMAX_PWMS] = {0};
-
-////////////////////////////////////////////////////////////////////////////////
-// Definitions
-////////////////////////////////////////////////////////////////////////////////
 
 void pwm_enable(uint16_t instance)
 {
@@ -130,14 +134,14 @@ bool pwm_set_sample(uint16_t instance, uint16_t sample)
 	}
 }
 
-void pwm_set_resolution(uint16_t instance, uint16_t bits)
+void pwm_set_resolution(uint16_t instance, uint32_t value)
 {
-    pwmSetup[instance].resolution = (uint8_t)bits;
+    pwmSetup[instance].resolution = value;
 }
 
-uint16_t pwm_get_resolution(uint16_t instance)
+uint32_t pwm_get_resolution(uint16_t instance)
 {
-    return ((uint16_t)pwmSetup[instance].resolution);
+    return (pwmSetup[instance].resolution);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
