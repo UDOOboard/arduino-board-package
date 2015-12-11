@@ -89,7 +89,8 @@
  * any clock nodes. The mechanism is to set every node's inital "is_always_open"
  * as 1. This macro is used to turn on this walkaround
  */
-// by fefr, if = 0 i2c not work fine !!!
+// modified for UdooNeo Board
+// if = 0 i2c not work fine !!!
 #define BSPCFG_CM_LINUX_PEER_WALKAROUND		1
 
 #define MQX_ENABLE_MCORE_LPM                1

@@ -161,7 +161,7 @@ extern vector_entry ram_vector[256];
 /*-----------------------------------------------------------------------------
 **                      GPIO
 */
-// by fefr
+// modified for UdooNeo Board
 /* SDB BOARD SW4 */
 /* GPIO PORT1_18 */
 //#define BSP_BUTTON1_PROMPT                  "SW4"
