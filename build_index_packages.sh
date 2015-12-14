@@ -32,7 +32,7 @@ REPO_DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 PACKAGE_VERSION="1.6.5"
 
 PACKAGE_INDEX_FILE=`mktemp`
-_PACKAGE_INDEX_FILE="$REPO_DIR/build/index.json"
+_PACKAGE_INDEX_FILE="$REPO_DIR/build/package_udoo_index.json"
 
 # boards are served via github pages
 BOARD_DOWNLOAD_URL="https://udooboard.github.io/arduino-board-package"
