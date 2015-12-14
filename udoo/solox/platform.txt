@@ -1,5 +1,5 @@
 
-# Arduino SAM Core and platform.
+# SoloX Core and platform.
 # ------------------------------
 #
 # For more info:
@@ -73,7 +73,6 @@ recipe.cpp.o.pattern="{compiler.path}{compiler.cpp.cmd}" {compiler.cpp.flags} -m
 # Actually core.a has been created as a dummy file. This way the structure is
 # leaved as it is. 
 
-o core.a e con un dummy file. Cosi lascio la struttura come originale
 recipe.ar.pattern="{compiler.path}{compiler.ar.cmd}" {compiler.ar.flags} {compiler.ar.extra_flags} "{build.path}/{archive_file}" "{object_file}"
 
 #link all
