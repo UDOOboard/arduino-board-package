@@ -1,7 +1,7 @@
 #include <mqx.h>
 #include <bsp.h>
 //#include <fio.h>
-#include <spi.h>
+#include <spi_bsp_mqx.h>
 #include "spi_mqx.h"
 
 #include "log_mqx.h"

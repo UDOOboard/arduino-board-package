@@ -62,7 +62,7 @@
 #include <lpm_imx6sx.h>
 #include <lpm.h>
 
-#include <spi.h>
+#include <spi_bsp_mqx.h>
 #include <spi_ecspi.h>
 #include <spi_slave_ecspi.h>
 
