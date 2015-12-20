@@ -1,0 +1,32 @@
+Source: arduino-board-package
+Section: electronics
+Priority: optional
+Maintainer: Ettore Chimenti <ek5.chimenti@gmail.com>
+Build-Depends: debhelper (>= 9.0.0)
+Standards-Version: 3.9.5
+Homepage: http://www.udoo.org
+#Vcs-Git: git://git.debian.org/collab-maint/arduino-board-package.git
+Vcs-Browser: https://github.com/UDOOboard/arduino-board-package
+
+Package: arduino-core-udooqdl
+Architecture: all
+Depends: ${shlibs:Depends}, ${misc:Depends}, arduino-core (>= 1.6.5), bossac-udoo
+Description: Code, examples, and libs for the UDOO Quad/Dual platform
+ Arduino is an open hardware microcontroller platform.  This package contains
+ the minimal set of tools to allow one to program a UDOO Quad/Dual.  It also contains
+ examples and libraries. For a CLI, see the 'arduino-mk' package.
+ .
+ This package does not include the Java based Integrated Development
+ Environment, which can be found in the 'arduino' package.
+
+Package: arduino-core-udooneo
+Architecture: all
+Depends: ${shlibs:Depends}, ${misc:Depends}, arduino-core (>= 1.6.5), 
+ udooneo-m4uploader, gcc-arm-none-eabi ( >= 4.9.3 ) 
+Description: Code, examples, and libs for the UDOO Neo platform
+ Arduino is an open hardware microcontroller platform.  This package contains
+ the minimal set of tools to allow one to program a UDOO Neo.  It also contains
+ examples and libraries. For a CLI, see the 'arduino-mk' package.
+ .
+ This package does not include the Java based Integrated Development
+ Environment, which can be found in the 'arduino' package.

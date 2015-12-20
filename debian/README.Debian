@@ -1,0 +1,6 @@
+arduino-board-package for Debian
+--------------------------------
+
+This package installs UDOO board packages inside Arduino IDE
+
+ -- Ettore Chimenti <ek5.chimenti@gmail.com>  Mon, 14 Dec 2015 15:38:47 +0100
