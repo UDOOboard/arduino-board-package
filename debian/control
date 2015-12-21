@@ -22,7 +22,8 @@ Description: Code, examples, and libs for the UDOO Quad/Dual platform
 Package: arduino-core-udooneo
 Architecture: all
 Depends: ${shlibs:Depends}, ${misc:Depends}, arduino-core (>= 1.6.5), 
- udooneo-m4uploader, gcc-arm-none-eabi ( >= 4.9.3 ) 
+ udooneo-m4uploader, gcc-arm-none-eabi ( >= 4.9.3 ), 
+ libstdc++-arm-none-eabi-newlib
 Description: Code, examples, and libs for the UDOO Neo platform
  Arduino is an open hardware microcontroller platform.  This package contains
  the minimal set of tools to allow one to program a UDOO Neo.  It also contains
