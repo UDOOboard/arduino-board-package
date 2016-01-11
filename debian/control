@@ -10,7 +10,8 @@ Vcs-Browser: https://github.com/UDOOboard/arduino-board-package
 
 Package: arduino-core-udooqdl
 Architecture: all
-Depends: ${shlibs:Depends}, ${misc:Depends}, arduino-core (>= 1.6.5), bossac-udoo
+Depends: ${shlibs:Depends}, ${misc:Depends}, arduino-core (>= 1.6.5), bossac-udoo,
+  gcc-arm-none-eabi ( >= 4.9.3 ), libstdc++-arm-none-eabi-newlib ( >= 4.9.2 )
 Description: Code, examples, and libs for the UDOO Quad/Dual platform
  Arduino is an open hardware microcontroller platform.  This package contains
  the minimal set of tools to allow one to program a UDOO Quad/Dual.  It also contains
@@ -23,7 +24,7 @@ Package: arduino-core-udooneo
 Architecture: all
 Depends: ${shlibs:Depends}, ${misc:Depends}, arduino-core (>= 1.6.5), 
  udooneo-m4uploader, gcc-arm-none-eabi ( >= 4.9.3 ), 
- libstdc++-arm-none-eabi-newlib
+ libstdc++-arm-none-eabi-newlib ( >= 4.9.2 )
 Description: Code, examples, and libs for the UDOO Neo platform
  Arduino is an open hardware microcontroller platform.  This package contains
  the minimal set of tools to allow one to program a UDOO Neo.  It also contains
