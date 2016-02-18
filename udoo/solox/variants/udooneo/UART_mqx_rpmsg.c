@@ -126,7 +126,7 @@ int32_t mqx_uartclass_write_rpmsg (const uint8_t uc_data)
   if (rpmsgIsInitialized == TRUE) {
     //ret_value = mcc_send(&mqx_endpoint_m4, &mqx_endpoint_a9, &uc_data, 1, MCC_SEND_TIMEOUT);
     // Send the message 
-    ret_value = rpmsg_rtos_send(ept, &uc_data, sizeof(&uc_data), TTY_ENDPT);
+    ret_value = rpmsg_rtos_send(ept, &uc_data, sizeof(uc_data), TTY_ENDPT);
     if(RPMSG_SUCCESS != ret_value) {
       printf("\nRPMSG Error[%d], sending the message using the send function failed", ret_value);
       return (-1);
