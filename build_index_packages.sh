@@ -26,10 +26,51 @@ if [ "${BASH_VERSION%%[^0-9]*}" -lt "4" ]; then
   exit 1
 fi
 
+scm_ver()
+{
+  ## from kernel sources
+
+	# Check for git and a git repo.
+	if test -z "$(git rev-parse --show-cdup 2>/dev/null)" &&
+	   head=`git rev-parse --verify --short HEAD 2>/dev/null`; then
+
+		# If we are at a tagged commit (like "v2.6.30-rc6"), we ignore
+		# it, because this version is defined in the top level Makefile.
+		if [ -z "`git describe --exact-match 2>/dev/null`" ]; then
+
+			# If we are past a tagged commit (like
+			# "v2.6.30-rc5-302-g72357d5"), we pretty print it.
+			if atag="`git describe 2>/dev/null`"; then
+       
+        #edited by ek5 -> 1.6.6-00001-g0bc4b15% (need plus)
+        awk -F- '{printf("%s-%05d-%s", $(NF-2), $(NF-1), $(NF))}' <<< "$atag"
+
+			# If we don't have a tag at all we print -g{commitish}.
+			else
+				printf '%s%s' -g $head
+			fi
+
+    else
+      #we do not have Makefiles lol
+      printf '%s' "`git describe 2>/dev/null`"
+		fi
+
+		# Check for uncommitted changes
+		if git diff-index --name-only HEAD | grep -qv "^debian/"; then
+			printf '%s' -dirty
+		fi
+
+		# All done with git
+		return
+	fi
+}
+
+### VARIABLES
+
 # get package script directory
 REPO_DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 
-PACKAGE_VERSION="1.6.5"
+PACKAGE_VERSION=`scm_ver`
 
 PACKAGE_INDEX_FILE=`mktemp`
 _PACKAGE_INDEX_FILE="$REPO_DIR/build/package_udoo_index.json"
@@ -45,13 +86,12 @@ ARCHS_TARGET[qdl]="sam"
 ARCHS_TARGET[neo]="solox"
 
 declare -a TOOLS
-TOOLS=( udooclient gcc-arm-none-eabi bossac-udoo ) 
-declare -A TOOLS_PKG
+TOOLS=( udooclient gcc-arm-none-eabi bossac-udoo )
 
 declare -a PACKAGEHOST
 PACKAGEHOST=( i686-mingw32 x86_64-apple-darwin x86_64-pc-linux-gnu i686-pc-linux-gnu )
 
-declare -A PACKAGEVERSION 
+declare -A PACKAGEVERSION
 PACKAGEVERSION[udooclient]="1.0"
 PACKAGEVERSION[bossac-udoo]="1.3a-1.0"
 PACKAGEVERSION[gcc-arm-none-eabi]="4.9-2014q4-20141203"
@@ -156,54 +196,10 @@ read -r -d '' TOOLS_FOOTER <<EOF
 }
 EOF
 
-
-#### DEBUG
-
-if [ -v DEBUG ] 
-then
-
-  echo -e "$PACKAGES_HEADER"
-  n="${#ARCHS_PKG[*]}"
-
-  #cycle board packages
-  for i in ${ARCHS[*]}
-  do
-    echo ----------------------------------- $i ----------------------------------- >&2
-    echo -n "        "
-    echo -n "${ARCHS_PKG["$i"]}"
-    let n--
-    (( $n )) && echo ','
-  done
-
-  echo -e "$PACKAGES_FOOTER"
-
-  echo
-  echo -n "      "
-  echo "$TOOLS_HEADER"
-
-  #cycle tools packages
-  n="${#TOOLS_PKG[*]}"
-  for i in ${TOOLS[*]}
-  do
-    echo ----------------------------------- $i ----------------------------------- >&2
-    echo -n "        "
-    echo -n "${TOOLS_PKG["$i"]}"
-    let n--
-    (( $n )) && echo ','
-  done
-
-  echo
-  echo -n "      "
-  echo "$TOOLS_FOOTER"
-
-  #EXIT
-  exit 0 
-fi
-
-# clean build dir
+# clean build dir (unless we are debugging)
 cd $REPO_DIR
-rm -rf build
-mkdir build
+(( DEBUG )) || rm -rf build
+mkdir -p build
 
 GREEN="\e[32m"
 RED="\e[31m"
@@ -348,27 +344,36 @@ EOF
       PACKAGENAME="$i-${PACKAGEVERSION[$i]}-${host}.tar.bz2"
       DOWNLOADURL="${DOWNLOADURL[$i]}/$PACKAGENAME"
 
-      log pre "Downloading $i for ${host}..."
-      OUTPUT=`wget -q "$DOWNLOADURL"`
+      #cleaning
+      (( DEBUG )) || rm -f $PACKAGENAME
 
-      #error management
-      if (( $? ))
-      then 
-        log err "\t\t ERROR"
-        log err "ERROR: Cannot download ${PACKAGENAME}" >&2 
-        log err "ERROR: Skipping ${host} for ${i}..." >&2 
-        cd $REPO_DIR
-        continue
+      #download the tools (unless they already exist)
+      if [[ -e $PACKAGENAME ]]
+      then
+        log "Found $i for ${host} in cache..."
       else
-        log "\t\t Done!"
+        log pre "Downloading $i for ${host}..."
+        wget -q "$DOWNLOADURL"
+
+        #error management
+        if (( $? ))
+        then
+          log err "\t\t ERROR"
+          log err "ERROR: Cannot download ${PACKAGENAME}" >&2
+          log err "ERROR: Skipping ${host} for ${i}..." >&2
+          cd $REPO_DIR
+          continue
+        else
+          log "\t\t Done!"
+        fi
       fi
 
       #get sha and size
       shasize $PACKAGENAME PACKAGESHA PACKAGESIZE
-      #don't need it anymore
-      rm $PACKAGENAME
+      #don't need it anymore (unless we are debugging)
+      (( DEBUG )) || rm $PACKAGENAME
 
-      cat >> $PACKAGE_INDEX_FILE <<EOF 
+      cat >> $PACKAGE_INDEX_FILE <<EOF
       $comma{
         "host":"$host",
         "url":"$DOWNLOADURL",
