@@ -26,10 +26,10 @@
  extern "C" {
 #endif
 
-#define ARD_DIO0		                    (LWGPIO_PORT4 | LWGPIO_PIN10)
-#define ARD_DIO0_MUX_GPIO                   (LWGPIO_MUX_PORT4_PIN10_GPIO)
-#define ARD_DIO1		                    (LWGPIO_PORT4 | LWGPIO_PIN11)
-#define ARD_DIO1_MUX_GPIO                   (LWGPIO_MUX_PORT4_PIN11_GPIO)
+#define ARD_DIO0		                    (LWGPIO_PORT6 | LWGPIO_PIN18)
+#define ARD_DIO0_MUX_GPIO                   (LWGPIO_MUX_PORT6_PIN18_GPIO)
+#define ARD_DIO1		                    (LWGPIO_PORT6 | LWGPIO_PIN19)
+#define ARD_DIO1_MUX_GPIO                   (LWGPIO_MUX_PORT6_PIN19_GPIO)
 #define ARD_DIO2		                    (LWGPIO_PORT4 | LWGPIO_PIN8)
 #define ARD_DIO2_MUX_GPIO                   (LWGPIO_MUX_PORT4_PIN8_GPIO)
 #define ARD_DIO3		                    (LWGPIO_PORT5 | LWGPIO_PIN15)
@@ -46,10 +46,10 @@
 #define ARD_DIO8_MUX_GPIO                   (LWGPIO_MUX_PORT4_PIN9_GPIO)
 #define ARD_DIO9		                    (LWGPIO_PORT5 | LWGPIO_PIN20)
 #define ARD_DIO9_MUX_GPIO                   (LWGPIO_MUX_PORT5_PIN20_GPIO)
-#define ARD_DIO10		                    (LWGPIO_PORT4 | LWGPIO_PIN5)
-#define ARD_DIO10_MUX_GPIO                   (LWGPIO_MUX_PORT4_PIN5_GPIO)
-#define ARD_DIO11		                    (LWGPIO_PORT4 | LWGPIO_PIN7)
-#define ARD_DIO11_MUX_GPIO                   (LWGPIO_MUX_PORT4_PIN7_GPIO)
+#define ARD_DIO10		                    (LWGPIO_PORT5 | LWGPIO_PIN18)
+#define ARD_DIO10_MUX_GPIO                   (LWGPIO_MUX_PORT5_PIN18_GPIO)
+#define ARD_DIO11		                    (LWGPIO_PORT5 | LWGPIO_PIN19)
+#define ARD_DIO11_MUX_GPIO                   (LWGPIO_MUX_PORT5_PIN19_GPIO)
 #define ARD_DIO12		                    (LWGPIO_PORT4 | LWGPIO_PIN4)
 #define ARD_DIO12_MUX_GPIO                   (LWGPIO_MUX_PORT4_PIN4_GPIO)
 #define ARD_DIO13		                    (LWGPIO_PORT4 | LWGPIO_PIN6)
@@ -143,23 +143,6 @@ extern int digitalRead( uint32_t ulPin )
 
     return (LOW);
 }
-
-
-void PrintMessageOut(uint16_t s)
-{
-	printf("Write %d to pin[0-13]\n", s);
-}
-
-void PrintInputMessage0(uint16_t i, uint16_t stInputs)
-{
-	printf("Initial state for pin[%d] = %d\n", i, stInputs);
-}
-
-void PrintInputMessage(uint16_t i, uint16_t stInputs)
-{
-	printf("New state for pin[%d] = %d\n", i, stInputs);
-}
-
 
 #ifdef __cplusplus
 }
