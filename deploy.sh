@@ -1,6 +1,9 @@
 #!/bin/bash
 set -e # exit with nonzero exit code if anything fails
 
+# Download tags
+git pull --tags
+
 # Compile 
 ./build_index_packages.sh
 #php generate.php global.json out
