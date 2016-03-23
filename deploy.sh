@@ -2,7 +2,7 @@
 set -e # exit with nonzero exit code if anything fails
 
 # Download tags
-git pull --tags
+git fetch --tags
 
 # Compile 
 ./build_index_packages.sh
