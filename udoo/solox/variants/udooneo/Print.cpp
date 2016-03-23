@@ -35,18 +35,22 @@
 /* default implementation: may be overridden */
 size_t Print::write(const uint8_t *buffer, size_t size)
 {
-	int32_t n = 0;
+
+	size_t n = 0;
 
 	if (size == 0) return (n);
 
-	if (!is_mcc)
-		n = mqx_uartclass_write_buffer (buffer, size);
-	else
+	if (is_mcc) {
 		n = mqx_uartclass_write_buffer_mcc (buffer, size);
-
-	if (n < 0) return (0);
-
-	return n;
+		if (n < 0) return (0);
+		return n;
+	}
+	else {
+		while (size--) {
+			n+=write(*buffer++);
+		}
+		return n;
+	}
 }
 
 size_t Print::print(const __FlashStringHelper *ifsh)
