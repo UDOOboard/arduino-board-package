@@ -94,6 +94,9 @@ private:
 	// Timeouts (
 	static const uint32_t RECV_TIMEOUT = 100000;
 	static const uint32_t XMIT_TIMEOUT = 100000;
+
+	// Control
+	bool isInitialized;
 };
 
 #if WIRE_INTERFACES_COUNT > 0
