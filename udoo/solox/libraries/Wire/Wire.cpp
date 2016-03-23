@@ -21,9 +21,8 @@
 
 extern "C" {
 #include <string.h>
-#include "I2C_mqx.h"
 }
-
+#include "I2C_mqx.h"
 #include "Wire.h"
 
 /* from MQX_IO_USER_GUIDE.pdf !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -42,11 +41,15 @@ TwoWire::TwoWire(uint8_t id) {
 	rxBufferIndex = 0;
 	txAddress = 0;
     mqx_idI2c = id;
+	bool isInitialized=false;
 }
 
 void TwoWire::begin(void) {
 
-	mqx_towire_begin(mqx_idI2c);
+	if (isInitialized == false) {
+		mqx_towire_begin(mqx_idI2c);
+		isInitialized = true;
+	}
 	status = MASTER_IDLE;
 }
 
