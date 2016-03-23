@@ -25,13 +25,13 @@
 extern "C" {
 #endif
 
-extern void AdcBegin(void);
+extern void StartupInit(void);
 void init_hwtimer1 (void);
 
 void init( void )
 {
 
-	AdcBegin();
+	StartupInit();
 #ifdef	MICRO_SEC_BY_HWTIMER1
 	init_hwtimer1 ();
 #endif

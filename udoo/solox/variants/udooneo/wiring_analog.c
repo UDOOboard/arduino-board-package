@@ -55,7 +55,12 @@ extern "C" {
 #define DEF_PWM_REPEAT						1			// default repeat
 
 // mapping arduino pins to pwm channels
-const uint8_t ardPinToPwmChn[ANALOG_WRITE_HIGHEST_NUMBER_PIN+1] = {255, 255, 255, PWM_CH0, PWM_CH1, PWM_CH2, PWM_CH3, PWM_CH4, 255, PWM_CH5, PWM_CH7, PWM_CH6};
+const uint8_t ardPinToPwmChn[ANALOG_WRITE_HIGHEST_NUMBER_PIN+1] = {
+			255, 255, 255,
+			PWM_CH0, PWM_CH1, PWM_CH2, PWM_CH3, PWM_CH4,
+			255,
+			PWM_CH5, PWM_CH7, PWM_CH6
+};
 
 extern const LWADC_INIT_STRUCT BSP_DEFAULT_LWADC_MODULE;
 extern const LWADC_INIT_STRUCT lwadc2_init;
@@ -177,6 +182,10 @@ void analogOutputInit(void) {
 void analogWrite(uint32_t ulPin, uint32_t ulValue) {
 
 	if (ulPin > ANALOG_WRITE_HIGHEST_NUMBER_PIN) return;
+
+	// for compatibility with arduino sketch
+	pinMode(ulPin, INPUT);
+
 	uint16_t pwmChn = ardPinToPwmChn[ulPin];
 	if (pwmChn == 255) return;
 
@@ -202,6 +211,22 @@ void analogWrite(uint32_t ulPin, uint32_t ulValue) {
 
 	ulValue = mapPwmResolution(ulValue, (uint32_t)1<<_writeResolution, pwm_get_resolution(pwmChn));
    	pwm_set_sample(pwmChn, (uint16_t)ulValue);
+}
+
+//-----------------------------------------
+// Init pins at startup otherwise pins used
+// as output or pwm remain at High level
+//-----------------------------------------
+void InitPins(void) {
+
+	int i;
+
+	for (i=PWM_CH0; i<=PWM_CH7; i++)
+		pwm_disable(i);
+	for (i=PWM_CH0; i<=PWM_CH7; i++)
+		_bsp_pwm_io_init(i, 0);
+	for (i=0; i<ARD_NMAX_DIO; i++)
+		pinMode(i,INPUT);
 }
 
 static void print_lwadc_attribute( LWADC_STRUCT_PTR lwadc_ptr, LWADC_ATTRIBUTE attribute, const char * name)
@@ -283,14 +308,15 @@ void test_adc(void)
 }
 */
 
-void AdcBegin(void)
+void StartupInit(void)
 {
-    printf("AdcBegin()\n");
+    printf("StartupInit()\n");
+    InitPins ();
     _lwadc_init(&lwadc1_init);
     _lwadc_init(&lwadc2_init);	//only two channels, vedi init_lwadc.c
     InitAdcs();
-    print_all_lwadc_attributes(lwadc_inputs);
-//    monitor_all_inputs();
+    //print_all_lwadc_attributes(lwadc_inputs);
+    //monitor_all_inputs();
 }
 
 #ifdef __cplusplus
