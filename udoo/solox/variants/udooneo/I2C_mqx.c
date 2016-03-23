@@ -53,7 +53,7 @@ void mqx_towire_begin (uint8_t i2cId)
     //unsigned char        *buffer;
 
 
-    printf ("Wire.begin log....... ... ");
+    printf ("Wire.begin log....... ... \n");
     printf ("Get current baud rate ... ");
     if(I2C_OK == ioctl(i2c_fd[i2cId], IO_IOCTL_I2C_GET_BAUD, &param))
     {
@@ -65,9 +65,9 @@ void mqx_towire_begin (uint8_t i2cId)
     }
 
     printf("Set master mode ... ");
-    if(I2C_OK == ioctl (i2c_fd[i2cId], IO_IOCTL_I2C_SET_MASTER_MODE, NULL))
+    if(I2C_OK == ioctl (i2c_fd[i2cId], IO_IOCTL_I2C_GET_MODE, &param))
     {
-        printf("OK\n");
+        printf("%d\n", param);
     }
     else
     {
@@ -94,32 +94,6 @@ void mqx_towire_begin (uint8_t i2cId)
     {
         printf("ERROR\n");
     }
-
-    printf ("Clear statistics ... ");
-    if(I2C_OK == ioctl(i2c_fd[i2cId], IO_IOCTL_I2C_CLEAR_STATISTICS, NULL))
-    {
-        printf("OK\n");
-    }
-    else
-    {
-        printf("ERROR\n");
-    }
-
-    printf("Get statistics ... ");
-    if(I2C_OK == ioctl(i2c_fd[i2cId], IO_IOCTL_I2C_GET_STATISTICS, (void *)&stats))
-    {
-        printf("OK\n  Interrupts:  %d\n", stats.INTERRUPTS);
-        printf("  Rx packets:  %d\n", stats.RX_PACKETS);
-        printf("  Tx packets:  %d\n", stats.TX_PACKETS);
-        printf("  Tx lost arb: %d\n", stats.TX_LOST_ARBITRATIONS);
-        printf("  Tx as slave: %d\n", stats.TX_ADDRESSED_AS_SLAVE);
-        printf("  Tx naks:     %d\n", stats.TX_NAKS);
-    }
-    else
-    {
-        printf("ERROR\n");
-    }
-
     printf("Get current state ... ");
     if (I2C_OK == ioctl(i2c_fd[i2cId], IO_IOCTL_I2C_GET_STATE, &param))
     {
@@ -159,16 +133,24 @@ int32_t mqx_towire_requestFrom(uint8_t i2cId, uint8_t address, uint8_t quantity,
 	int n = quantity;
     _mqx_int result = I2C_OK;
 
-	result = ioctl (i2c_fd[i2cId], IO_IOCTL_I2C_SET_DESTINATION_ADDRESS, &address);
+    //fflush(i2c_fd[i2cId]);
 
     result = ioctl (i2c_fd[i2cId], IO_IOCTL_I2C_REPEATED_START, NULL);
-    //result = ioctl (i2c_dev, IO_IOCTL_I2C_SET_RX_REQUEST, &n);
+    result = ioctl (i2c_fd[i2cId], IO_IOCTL_I2C_SET_RX_REQUEST, &n);
 
 	readed = fread(ptrRx, 1, n, i2c_fd[i2cId]);
-//	fflush(i2c_dev);
+
 	if (sendStop) {
 		result = ioctl (i2c_fd[i2cId], IO_IOCTL_I2C_STOP, NULL);
 	}
+
+#ifdef MQX_LOG_I2C
+	int32_t i;
+	printf ("I2C readed ");
+	for (i=0; i<readed; i++)
+		printf ("[%02X]", ptrRx[i]);
+	printf ("\n");
+#endif
 	return (readed);
 }
 
@@ -177,10 +159,23 @@ int32_t mqx_towire_endTransmission(uint8_t i2cId, uint8_t address, uint8_t quant
     _mqx_int result = I2C_OK;
 
 	result = ioctl (i2c_fd[i2cId], IO_IOCTL_I2C_SET_DESTINATION_ADDRESS, &address);
+#ifdef MQX_LOG_I2C
+	if (I2C_OK != result) {
+		printf ("IO_IOCTL_I2C_SET_DESTINATION_ADDRESS - Error = [%d]\n", result);
+	}
+#endif
 	result = fwrite(ptrTx, 1, quantity, i2c_fd[i2cId]);
+#ifdef MQX_LOG_I2C
+	if (0 == result) {
+		printf ("I2C fwrite - Error = [%d]\n", result);
+	}
+#endif
 	fflush(i2c_fd[i2cId]);
 	if (sendStop) {
 		result = ioctl (i2c_fd[i2cId], IO_IOCTL_I2C_STOP, NULL);
+		if (I2C_OK != result) {
+			printf ("IO_IOCTL_I2C_STOP - Error = [%d]\n", result);
+		}
 	}
 	return (result);
 }
