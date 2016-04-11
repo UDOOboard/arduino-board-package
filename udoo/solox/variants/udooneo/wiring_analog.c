@@ -183,9 +183,6 @@ void analogWrite(uint32_t ulPin, uint32_t ulValue) {
 
 	if (ulPin > ANALOG_WRITE_HIGHEST_NUMBER_PIN) return;
 
-	// for compatibility with arduino sketch
-	pinMode(ulPin, INPUT);
-
 	uint16_t pwmChn = ardPinToPwmChn[ulPin];
 	if (pwmChn == 255) return;
 
