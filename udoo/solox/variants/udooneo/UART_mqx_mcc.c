@@ -16,9 +16,6 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-//#include <stdio.h>
-//#include <string.h>
-
 // this file is a wrapper for call mqx api without conflict with stdio.h, stdlib.h
 // fio.h redefine write, read etc..
 
@@ -35,7 +32,8 @@
 #include "log_mqx.h"
 
 #if ! BSPCFG_ENABLE_IO_SUBSYSTEM
-#error This application requires BSPCFG_ENABLE_IO_SUBSYSTEM defined non-zero in user_config.h. Please recompile BSP with this option.
+#error This application requires BSPCFG_ENABLE_IO_SUBSYSTEM defined non-zero in \
+	user_config.h. Please recompile BSP with this option.
 #endif
 
 #define ARDUINO_SERIAL_DEBUG_RX
@@ -65,9 +63,11 @@ void mqx_uartclass_init_mcc (void)
         _task_block();
     }
 
-    //ret_value = mcc_get_info(node_num, &mcc_info);
-
+    _time_delay(100);
     ret_value = mcc_create_endpoint(&mqx_endpoint_m4, MCC_PORT_M4);
+    if(MCC_SUCCESS != ret_value) {
+        printf("\n\n\nError, failed to create m4 mcc ep. Error code = %i\n", ret_value);
+    }
     mccIsInitialized = TRUE;
 
 #ifdef ARDUINO_SERIAL_DEBUG_RX
@@ -81,12 +81,13 @@ void mqx_uartclass_init_mcc (void)
 	}
 #endif
 
+	_time_delay(400);
 }
 
 void mqx_uartclass_end_mcc (void)
 {
 	if (mccIsInitialized == TRUE) {
-		mcc_destroy(NODE_NUM);
+		mcc_destroy_endpoint(&mqx_endpoint_m4);
 		mccIsInitialized = FALSE;
 	}
 }
@@ -101,9 +102,14 @@ int32_t mqx_uartclass_write_mcc (const uint8_t uc_data)
     int             ret_value;
 
 	if (mccIsInitialized == TRUE) {
-		ret_value = mcc_send(&mqx_endpoint_m4, &mqx_endpoint_a9, &uc_data, 1, MCC_SEND_TIMEOUT);
+		ret_value = mcc_send(&mqx_endpoint_m4, &mqx_endpoint_a9, (void *)&uc_data, 1, MCC_SEND_TIMEOUT);
 		if(MCC_SUCCESS != ret_value) {
-			printf("\nMCC Error[%d], sending the message using the send function failed", ret_value);
+			printf("\nMCC Error[%d], sending the message using the send byte function failed\n", 
+			       ret_value);
+			printf("M4 endpoint [%i,%i,%i]\n", mqx_endpoint_m4.core,
+			       mqx_endpoint_m4.node, mqx_endpoint_m4.port);
+			printf("A9 endpoint [%i,%i,%i]\n", mqx_endpoint_a9.core,
+			       mqx_endpoint_a9.node, mqx_endpoint_a9.port);
 			return (-1);
 		}
 		return (1);
@@ -117,9 +123,14 @@ int32_t mqx_uartclass_write_buffer_mcc (const uint8_t *ptr, uint16_t len)
 
 	if (mccIsInitialized == TRUE) {
 		//printf("mcc string = <%s> len = %d\r\n", ptr, len);
-		ret_value = mcc_send(&mqx_endpoint_m4, &mqx_endpoint_a9, ptr, len+1, MCC_SEND_TIMEOUT);
+		ret_value = mcc_send(&mqx_endpoint_m4, &mqx_endpoint_a9, (void *)ptr, len+1, MCC_SEND_TIMEOUT);
 		if(MCC_SUCCESS != ret_value) {
-			printf("\nMCC Error[%d], sending the message using the send function failed", ret_value);
+			printf("\nMCC Error[%d], sending the message using the send buffer function failed\n",
+			       ret_value);
+			printf("M4 endpoint [%i,%i,%i]\n", mqx_endpoint_m4.core,
+			       mqx_endpoint_m4.node, mqx_endpoint_m4.port);
+			printf("A9 endpoint [%i,%i,%i]\n", mqx_endpoint_a9.core,
+			       mqx_endpoint_a9.node, mqx_endpoint_a9.port);
 			return (-1);
 		}
 		return (len);
@@ -145,32 +156,23 @@ void mqx_mccuart_receive_task (uint32_t initial_data)
     while (TRUE)  {
 
 
-        ret_value = mcc_recv(&mqx_endpoint_a9, &mqx_endpoint_m4, &msg, sizeof(MCC_UART_MESSAGE), &num_of_received_bytes, 0xffffffff);
-/*
-        if(MCC_SUCCESS != ret_value) {
-            printf("Responder task receive error: %i\n", ret_value);
-        } else {
-            printf("Responder task received a msg from [%i,%i,%i] endpoint\n", mqx_endpoint_a9.core, mqx_endpoint_a9.node, mqx_endpoint_a9.port);
-            printf("Message: Size=%x, DATA = \"%s\"\n", num_of_received_bytes, testBuffer);
-            ret_value = mcc_send(&mqx_endpoint_m4, &mqx_endpoint_a9, &testBuffer, sizeof(testBuffer), 0xffffffff);
-            if(MCC_SUCCESS != ret_value) {
-                printf("\nError, sending the message using the send function failed");
-            }
-        }
-*/
+	ret_value = mcc_recv(&mqx_endpoint_a9, &mqx_endpoint_m4, &msg,
+			     sizeof(MCC_UART_MESSAGE), &num_of_received_bytes,
+			     0xffffffff);
 
         if(MCC_SUCCESS == ret_value) {
-            printf("MCC received a msg from A9 [%i,%i,%i] endpoint  len=%d\n", mqx_endpoint_a9.core, mqx_endpoint_a9.node, mqx_endpoint_a9.port, num_of_received_bytes);
-        	for (cnt=0; cnt<num_of_received_bytes; cnt++) {
-            	call_irq_handler(&Serial, msg.DATA[cnt]);
-        	}
+		for (cnt=0; cnt<num_of_received_bytes; cnt++) {
+			call_irq_handler(&Serial, msg.DATA[cnt]);
+		}
+        }
+        else {
+			printf("\nMCC Error[%d], mcc_recv\n", ret_value);
+			printf("M4 endpoint [%i,%i,%i]\n", mqx_endpoint_m4.core,
+			       mqx_endpoint_m4.node, mqx_endpoint_m4.port);
+			printf("A9 endpoint [%i,%i,%i]\n", mqx_endpoint_a9.core,
+			       mqx_endpoint_a9.node, mqx_endpoint_a9.port);
         }
 
-    	/*
-    	testCounter++;
-    	printf("testCounterRxTask=%d\n", testCounter);
-    	_time_delay(500);
-    	*/
     }
 }
 #endif

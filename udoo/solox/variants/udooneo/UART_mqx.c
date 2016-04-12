@@ -26,7 +26,8 @@
 #include "log_mqx.h"
 
 #if ! BSPCFG_ENABLE_IO_SUBSYSTEM
-#error This application requires BSPCFG_ENABLE_IO_SUBSYSTEM defined non-zero in user_config.h. Please recompile BSP with this option.
+#error This application requires BSPCFG_ENABLE_IO_SUBSYSTEM defined non-zero in \
+	user_config.h. Please recompile BSP with this option.
 #endif
 
 // serial
@@ -168,7 +169,7 @@ void mqx_uartclass_flush (void)
 
 int32_t mqx_uartclass_write (const uint8_t uc_data)
 {
-	return (write(serial_dev, &uc_data, 1));
+	return (write(serial_dev, (void *)&uc_data, 1));
 }
 
 int32_t mqx_uartclass_write_buffer (const uint8_t *ptr, uint16_t len)
