@@ -10,9 +10,7 @@
  */
 
 #include "SPI.h"
-extern "C" {
 #include "spi_mqx.h"
-}
 
 SPIClass::SPIClass(char _spi, void(*_initCb)(void)) :
 	spi(_spi), initCb(_initCb), initialized(false)
@@ -22,7 +20,6 @@ SPIClass::SPIClass(char _spi, void(*_initCb)(void)) :
 
 void SPIClass::begin() {
 	init();
-
 	// NPCS control is left to the user
 	mqx_spi_begin(0);
 
@@ -34,7 +31,6 @@ void SPIClass::begin() {
 
 void SPIClass::begin(uint8_t _pin) {
 	init();
-
 	// NPCS control is left to spi driver
 	mqx_spi_begin(_pin);
 

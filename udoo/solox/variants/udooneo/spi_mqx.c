@@ -73,7 +73,7 @@ static MQX_FILE_PTR spifd = NULL;
 
 void mqx_spi_begin (uint8_t csPin)
 {
-    _io_spi_install(spiChannelsCS[SPI_INTERFACE-1], &_bsp_spi5_init);
+    _io_spi_install((char *)spiChannelsCS[SPI_INTERFACE-1], &_bsp_spi5_init);
 
 	// IMPORTANT: ---------------------------------------------------
 	//spiChannelsNoCS not work. For change cs in manual mode, I modified init_gpio.c in bsp source
@@ -232,7 +232,7 @@ void mqx_spi_end (void)
 		fflush (spifd);
 		fclose(spifd);
 
-		int32_t error_code = _io_dev_uninstall(spiChannelsCS[SPI_INTERFACE-1]);
+		int32_t error_code = _io_dev_uninstall((char *)spiChannelsCS[SPI_INTERFACE-1]);
 		if (error_code != IO_OK) {
 			printf("Error uninstalling %s.\n", spiChannelsCS[SPI_INTERFACE-1]);
 			_task_block();
