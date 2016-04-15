@@ -174,6 +174,7 @@ static void main_task
     )
 {
     _task_id created_task_id = MQX_NULL_TASK_ID;
+    bool endSketch = false;
 
     printf("\n\nmain_task is running...........\n");
 
@@ -249,6 +250,17 @@ static void main_task
 		printf("user task2 created \n");
 	}
 #endif
+
+	_time_delay(100);
+	do {
+		if (*((uint8_t *)0xbff0ffff) == 0xAA)
+			endSketch = true;
+		_time_delay(100);
+	}while (!endSketch);
+	//*((uint8_t *)0xbff0ffff) = 0; not work fine
+	printf("mqx_exit !!\n");
+	_time_delay(100);
+	_mqx_exit(1);
 
 	printf("main-task blocked !!\n");
 	_task_block();
