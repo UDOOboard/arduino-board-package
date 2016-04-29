@@ -198,7 +198,6 @@ EOF
 
 # clean build dir (unless we are debugging)
 cd $REPO_DIR
-(( DEBUG )) || rm -rf build
 mkdir -p build
 
 GREEN="\e[32m"
@@ -344,9 +343,6 @@ EOF
       PACKAGENAME="$i-${PACKAGEVERSION[$i]}-${host}.tar.bz2"
       DOWNLOADURL="${DOWNLOADURL[$i]}/$PACKAGENAME"
 
-      #cleaning
-      (( DEBUG )) || rm -f $PACKAGENAME
-
       #download the tools (unless they already exist)
       if [[ -e $PACKAGENAME ]]
       then
@@ -370,8 +366,6 @@ EOF
 
       #get sha and size
       shasize $PACKAGENAME PACKAGESHA PACKAGESIZE
-      #don't need it anymore (unless we are debugging)
-      (( DEBUG )) || rm $PACKAGENAME
 
       cat >> $PACKAGE_INDEX_FILE <<EOF
       $comma{
