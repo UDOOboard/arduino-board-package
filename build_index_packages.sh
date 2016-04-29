@@ -1,5 +1,5 @@
 #!/bin/bash
-# 
+#
 # build_index_packages.sh
 # Builds packages and index file for Arduino IDE
 #
@@ -41,7 +41,7 @@ scm_ver()
 			# If we are past a tagged commit (like
 			# "v2.6.30-rc5-302-g72357d5"), we pretty print it.
 			if atag="`git describe 2>/dev/null`"; then
-       
+      
         #edited by ek5 -> 1.6.6-00001-g0bc4b15% (need plus)
         awk -F- '{printf("%s-%05d-%s", $(NF-2), $(NF-1), $(NF))}' <<< "$atag"
 
@@ -208,14 +208,14 @@ RST="\e[0m"
 function log() {
 
   # args: string
-  local EXIT 
-  local COLOR=${GREEN}${BOLD}  
+  local EXIT
+  local COLOR=${GREEN}${BOLD} 
   local MOD="-e"
 
   case $1 in
     err) COLOR=${RED}${BOLD}
       shift ;;
-    pre) MOD+="n" 
+    pre) MOD+="n"
       shift ;;
     fat) COLOR=${RED}${BOLD}
       EXIT=1
@@ -230,7 +230,7 @@ function log() {
 }
 
 function shasize() {
-  
+ 
   # args: archive_path sha_return size_return
 
   local arc=$1
@@ -281,7 +281,7 @@ unset ok_pkg
 
 #cycle every package
 for i in ${ARCHS[*]}
-do 
+do
 
   HARDWARE_FILES="udoo/${ARCHS_TARGET[$i]}"
   BOARD_ARCHIVE_NAME="udoo$i-arduino-${ARCHS_TARGET[$i]}-$PACKAGE_VERSION"
@@ -290,9 +290,9 @@ do
 
   # create archives and get sha & size
   archive "$BOARD_ARCHIVE_NAME" "$HARDWARE_FILES" PACKAGESHA PACKAGESIZE
-  
+ 
   cd $REPO_DIR
-  
+ 
   #put a comma on previous snippet
   (( $ok_pkg )) && echo , >> $PACKAGE_INDEX_FILE
 
@@ -308,7 +308,7 @@ do
   ok_pkg=1
 
 done
-#end package 
+#end package
 
 unset ok_pkg
 
@@ -324,7 +324,7 @@ do
   [ -v ok_tool ] && comma=","
 
   # fill in board json template
-  cat >> $PACKAGE_INDEX_FILE <<EOF 
+  cat >> $PACKAGE_INDEX_FILE <<EOF
   $comma{
     "name":"${i}",
     "version":"${PACKAGEVERSION[$i]}",
