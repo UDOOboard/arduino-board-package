@@ -69,6 +69,7 @@ scm_ver()
 
 # get package script directory
 REPO_DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+SHA_DIR="${REPO_DIR}/packages"
 
 PACKAGE_VERSION=`scm_ver`
 
@@ -343,11 +344,19 @@ EOF
       PACKAGENAME="$i-${PACKAGEVERSION[$i]}-${host}.tar.bz2"
       DOWNLOADURL="${DOWNLOADURL[$i]}/$PACKAGENAME"
 
-      #download the tools (unless they already exist)
-      if [[ -e $PACKAGENAME ]]
+      #check for a previous shasum
+      if [[ -e ${SHA_DIR}/${PACKAGENAME}.sha ]]
       then
+        log "Found $i shasum for ${host}..."
+        read PACKAGESHA file < "${SHA_DIR}/${PACKAGENAME}.sha"
+      elif [[ -e ${PACKAGENAME} ]]
+      then
+        #if not, check for a predownloaded one
         log "Found $i for ${host} in cache..."
+        #get sha and size
+        shasize $PACKAGENAME PACKAGESHA PACKAGESIZE
       else
+        #download the tools (unless they already exist)
         log pre "Downloading $i for ${host}..."
         wget -q "$DOWNLOADURL"
 
@@ -361,11 +370,10 @@ EOF
           continue
         else
           log "\t\t Done!"
+          #get sha and size
+          shasize $PACKAGENAME PACKAGESHA PACKAGESIZE
         fi
       fi
-
-      #get sha and size
-      shasize $PACKAGENAME PACKAGESHA PACKAGESIZE
 
       cat >> $PACKAGE_INDEX_FILE <<EOF
       $comma{
