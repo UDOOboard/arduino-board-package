@@ -257,7 +257,7 @@ function archive() {
 
   log pre "Building $arc..."
 
-  tar -jcf build/$arc -C $2 .
+  tar -jcf build/$arc -C $2 --exclude '*swp' --exclude '*~' --exclude '.git*' .
 
   shasize build/$arc sha size
 
