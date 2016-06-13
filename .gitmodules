@@ -19,3 +19,6 @@
 [submodule "udoo/solox/libraries/Barometric_Brick_neo"]
 	path = udoo/solox/libraries/Barometric_Brick_neo
 	url = https://github.com/UDOOboard/Adafruit_MPL3115A2_Library
+[submodule "udoo/solox/libraries/TM1637"]
+	path = udoo/solox/libraries/TM1637
+	url = https://github.com/ektor5/TM1637
