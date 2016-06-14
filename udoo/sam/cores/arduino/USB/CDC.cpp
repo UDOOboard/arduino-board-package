@@ -17,6 +17,7 @@
 #include "Arduino.h"
 #include "USBAPI.h"
 #include "Reset.h"
+#include "Print.h"
 
 #ifdef CDC_ENABLED
 
@@ -53,6 +54,8 @@ static volatile LineInfo _usbLineInfo = {
     0x08,  // bDataBits
     0x00   // lineState
 };
+
+static volatile int32_t breakValue = -1;
 
 _Pragma("pack(1)")
 static const CDCDescriptor _cdcInterface =
@@ -103,7 +106,7 @@ int WEAK CDC_GetOtherInterface(uint8_t* interfaceNum)
 	return USBD_SendControl(0,&_cdcOtherInterface,sizeof(_cdcOtherInterface));
 }
 
-bool WEAK CDC_Setup(Setup& setup)
+bool WEAK CDC_Setup(USBSetup& setup)
 {
 	uint8_t r = setup.bRequest;
 	uint8_t requestType = setup.bmRequestType;
@@ -138,6 +141,12 @@ bool WEAK CDC_Setup(Setup& setup)
 				else
 					cancelReset();
 			}
+			return true;
+		}
+
+		if (CDC_SEND_BREAK == r)
+		{
+			breakValue = ((uint16_t)setup.wValueH << 8) | setup.wValueL;
 			return true;
 		}
 	}
@@ -297,6 +306,51 @@ Serial_::operator bool()
 
 	delay(10);
 	return result;
+}
+
+int32_t Serial_::readBreak() {
+	uint8_t enableInterrupts = ((__get_PRIMASK() & 0x1) == 0 && (__get_FAULTMASK() & 0x1) == 0);
+
+	// disable interrupts,
+	// to avoid clearing a breakValue that might occur 
+	// while processing the current break value
+	__disable_irq();
+
+	int ret = breakValue;
+
+	breakValue = -1;
+
+	if (enableInterrupts)
+	{
+		// re-enable the interrupts
+		__enable_irq();
+	}
+
+	return ret;
+}
+
+unsigned long Serial_::baud() {
+	return _usbLineInfo.dwDTERate;
+}
+
+uint8_t Serial_::stopbits() {
+	return _usbLineInfo.bCharFormat;
+}
+
+uint8_t Serial_::paritytype() {
+	return _usbLineInfo.bParityType;
+}
+
+uint8_t Serial_::numbits() {
+	return _usbLineInfo.bDataBits;
+}
+
+bool Serial_::dtr() {
+	return _usbLineInfo.lineState & 0x1;
+}
+
+bool Serial_::rts() {
+	return _usbLineInfo.lineState & 0x2;
 }
 
 Serial_ SerialUSB;

@@ -1,4 +1,3 @@
-
 udooqdl.name=UDOO QDL (Arduino Due)
 udooqdl.vid.0=0x2341
 udooqdl.pid.0=0x003d
