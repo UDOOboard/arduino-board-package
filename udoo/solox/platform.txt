@@ -19,15 +19,17 @@ compiler.warning_flags.all=-Wall -Wextra
 
 compiler.path={runtime.tools.gcc-arm-none-eabi.path}/bin/
 compiler.c.cmd=arm-none-eabi-gcc
-compiler.c.flags={compiler.warning_flags} -mcpu=cortex-m4 -march=armv7e-m -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16 -Os -fmessage-length=0 -ffunction-sections -fdata-sections  -g -D_AEABI_LC_CTYPE=C -D__STRICT_ANSI__=1 -std=gnu11 -MMD -MP -c
+compiler.c.flags=-c -g -Os {compiler.warning_flags} -mcpu=cortex-m4 -march=armv7e-m -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16 -fmessage-length=0 -ffunction-sections -fdata-sections -D_AEABI_LC_CTYPE=C -D__STRICT_ANSI__=1 -std=gnu11 -MMD
+# -MP -c
 # Note: -fno-rtti allows to libsupc++ to be not included, resulting in a
 # smaller binary (<50K).
 
 compiler.c.elf.cmd=arm-none-eabi-gcc
-compiler.c.elf.flags=
+compiler.c.elf.flags=-Os -Wl,--gc-sections -save-temps
 compiler.S.flags=-c -g -x assembler-with-cpp
 compiler.cpp.cmd=arm-none-eabi-g++
-compiler.cpp.flags={compiler.warning_flags} -mcpu=cortex-m4 -march=armv7e-m -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16 -Os -fmessage-length=0 -ffunction-sections -fdata-sections  -g -D_AEABI_LC_CTYPE=C -D__STRICT_ANSI__=1 -std=gnu++11 -fabi-version=0 -MMD -MP -c
+compiler.cpp.flags=-c -g -Os {compiler.warning_flags} -mcpu=cortex-m4 -march=armv7e-m -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16 -Os -fmessage-length=0 -ffunction-sections -fdata-sections  -g -D_AEABI_LC_CTYPE=C -D__STRICT_ANSI__=1 -std=gnu++11 -fabi-version=0 -MMD 
+# -MP -c
 compiler.ar.cmd=arm-none-eabi-ar
 compiler.ar.flags=rcs
 compiler.objcopy.cmd=arm-none-eabi-objcopy
@@ -37,6 +39,7 @@ compiler.elf2hex.cmd=arm-none-eabi-objcopy
 compiler.ldflags=
 compiler.size.cmd=arm-none-eabi-size
 compiler.define=-DARDUINO=123456
+compiler.combine.flags=-u _sbrk -u link -u _close -u _fstat -u _isatty -u _lseek -u _read -u _write -u _exit -u kill -u _getpid
 
 # this can be overriden in boards.txt
 build.extra_flags=
@@ -76,7 +79,7 @@ recipe.cpp.o.pattern="{compiler.path}{compiler.cpp.cmd}" {compiler.cpp.flags} -m
 recipe.ar.pattern="{compiler.path}{compiler.ar.cmd}" {compiler.ar.flags} {compiler.ar.extra_flags} "{build.path}/{archive_file}" "{object_file}"
 
 #link all
-recipe.c.combine.pattern="{compiler.path}{compiler.c.elf.cmd}" -mcpu=cortex-m4 -march=armv7e-m -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16 -Os -fmessage-length=0 -ffunction-sections -fdata-sections  -g "-L{build.path}" "-L{build.variant.path}/mqx/release/psp" "-L{build.variant.path}/mqx/release/bsp" "-L{build.variant.path}/mqx/release/mcc" "-L/usr/lib/arm-none-eabi/lib/armv7e-m/fpu" "-T{build.variant.path}/{build.ldscript}" "-T{build.variant.path}/linker_scripts/gcc/libs.ld" -nostartfiles -nodefaultlibs -nostdlib -Xlinker --gc-sections "-Wl,-Map,{build.path}/{build.project_name}.map" -Xlinker --cref -z muldefs -o "{build.path}/{build.project_name}.elf" {object_files}
+recipe.c.combine.pattern="{compiler.path}{compiler.c.elf.cmd}" -mcpu=cortex-m4 -march=armv7e-m -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16 -Os -fmessage-length=0 -ffunction-sections -fdata-sections  -g "-L{build.path}" "-L{build.variant.path}/mqx/release/psp" "-L{build.variant.path}/mqx/release/bsp" "-L{build.variant.path}/mqx/release/mcc" "-L/usr/lib/arm-none-eabi/lib/armv7e-m/fpu" "-T{build.variant.path}/{build.ldscript}" "-T{build.variant.path}/linker_scripts/gcc/libs.ld" -nostartfiles -nodefaultlibs -nostdlib -Xlinker --gc-sections "-Wl,-Map,{build.path}/{build.project_name}.map" -Xlinker --cref -z muldefs -o "{build.path}/{build.project_name}.elf" {compiler.combine.flags} {object_files}
 # "{build.path}/{archive_file}"
 
 #-gdwarf-2 -gstrict-dwarf , indagare
