@@ -76,7 +76,7 @@ recipe.cpp.o.pattern="{compiler.path}{compiler.cpp.cmd}" {compiler.cpp.flags} -m
 # Actually core.a has been created as a dummy file. This way the structure is
 # leaved as it is. 
 
-recipe.ar.pattern="{compiler.path}{compiler.ar.cmd}" {compiler.ar.flags} {compiler.ar.extra_flags} "{build.path}/{archive_file}" "{object_file}"
+recipe.ar.pattern="{compiler.path}{compiler.ar.cmd}" {compiler.ar.flags} {compiler.ar.extra_flags} "{archive_file_path}" "{object_file}"
 
 #link all
 recipe.c.combine.pattern="{compiler.path}{compiler.c.elf.cmd}" -mcpu=cortex-m4 -march=armv7e-m -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16 -Os -fmessage-length=0 -ffunction-sections -fdata-sections  -g "-L{build.path}" "-L{build.variant.path}/mqx/release/psp" "-L{build.variant.path}/mqx/release/bsp" "-L{build.variant.path}/mqx/release/mcc" "-L/usr/lib/arm-none-eabi/lib/armv7e-m/fpu" "-T{build.variant.path}/{build.ldscript}" "-T{build.variant.path}/linker_scripts/gcc/libs.ld" -nostartfiles -nodefaultlibs -nostdlib -Xlinker --gc-sections "-Wl,-Map,{build.path}/{build.project_name}.map" -Xlinker --cref -z muldefs -o "{build.path}/{build.project_name}.elf" {compiler.combine.flags} {object_files}
