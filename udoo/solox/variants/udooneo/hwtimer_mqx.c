@@ -7,11 +7,11 @@ HWTIMER hwtimer1;                               //hwtimer handle
 
 uint32_t mqx_hwtimer_get_us (void)
 {
-    return (hwtimer_get_ticks(&hwtimer1) << 1);
+    return (hwtimer_get_ticks(&hwtimer1) << 2);
 }
 
 // this timer is used to get elapsed microseconds
-// the resolution is 2 usec
+// the resolution is 4 usec
 void init_hwtimer1 (void)
 {
 
@@ -26,8 +26,8 @@ void init_hwtimer1 (void)
         printf(" OK\n");
     }
 
-    printf("Try to set period %d us to hwtimer1\n", 1);
-    hwtimer_set_period(&hwtimer1, BSP_HWTIMER1_SOURCE_CLK, 2);	// if setting period=1 time=1.5 usec
+    printf("Try to set period %d us to hwtimer1\n", 4);
+    hwtimer_set_period(&hwtimer1, BSP_HWTIMER1_SOURCE_CLK, 4);	// if setting period < 4 not work fine
     printf("Read frequency from hwtimer1 : %d Hz\n", hwtimer_get_freq(&hwtimer1));
     printf("Read period from hwtimer1    : %d us\n", hwtimer_get_period(&hwtimer1));
     printf("Read modulo from hwtimer1    : %d\n", hwtimer_get_modulo(&hwtimer1));
@@ -41,6 +41,6 @@ void deinit_hwtimer1 (void)
 {
 
     printf("Deinit hwtimer1\n");
+    hwtimer_stop(&hwtimer1);
     hwtimer_deinit(&hwtimer1);
-
 }
