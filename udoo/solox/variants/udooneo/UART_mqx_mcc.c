@@ -52,7 +52,8 @@ typedef struct mcc_uart_message
    uint8_t  DATA[MCC_ATTR_BUFFER_SIZE_IN_BYTES-24];
 } MCC_UART_MESSAGE;
 
-void mqx_uartclass_init_mcc (void)
+
+int mqx_uartclass_init_mcc (void)
 {
     int             ret_value;
 
@@ -63,7 +64,6 @@ void mqx_uartclass_init_mcc (void)
         _task_block();
     }
 
-    _time_delay(100);
     ret_value = mcc_create_endpoint(&mqx_endpoint_m4, MCC_PORT_M4);
     if(MCC_SUCCESS != ret_value) {
         printf("\n\n\nError, failed to create m4 mcc ep. Error code = %i\n", ret_value);
@@ -81,12 +81,16 @@ void mqx_uartclass_init_mcc (void)
 	}
 #endif
 
-	_time_delay(400);
+	_time_delay(100);
+
+	return (0);
 }
 
 void mqx_uartclass_end_mcc (void)
 {
 	if (mccIsInitialized == TRUE) {
+		printf("call mqx_uartclass_end_mcc()\n");
+		_task_destroy (serial_task_id_mcc);
 		mcc_destroy_endpoint(&mqx_endpoint_m4);
 		mccIsInitialized = FALSE;
 	}
@@ -153,26 +157,31 @@ void mqx_mccuart_receive_task (uint32_t initial_data)
 
 	uint32_t testCounter = 0;
 
-    while (TRUE)  {
+	while (TRUE)  {
 
+		if (mccIsInitialized == TRUE) {
 
-	ret_value = mcc_recv(&mqx_endpoint_a9, &mqx_endpoint_m4, &msg,
-			     sizeof(MCC_UART_MESSAGE), &num_of_received_bytes,
-			     0xffffffff);
+			ret_value = mcc_recv(&mqx_endpoint_a9, &mqx_endpoint_m4, &msg,
+					     sizeof(MCC_UART_MESSAGE), &num_of_received_bytes,
+					     0xffffffff);
 
-        if(MCC_SUCCESS == ret_value) {
-		for (cnt=0; cnt<num_of_received_bytes; cnt++) {
-			call_irq_handler(&Serial, msg.DATA[cnt]);
+			if(MCC_SUCCESS == ret_value) {
+				for (cnt=0; cnt<num_of_received_bytes; cnt++) {
+					call_irq_handler(&Serial, msg.DATA[cnt]);
+				}
+			}
+			else {
+				printf("\nMCC Error[%d], mcc_recv\n", ret_value);
+				printf("M4 endpoint [%i,%i,%i]\n",
+				       mqx_endpoint_m4.core,
+				       mqx_endpoint_m4.node,
+				       mqx_endpoint_m4.port);
+				printf("A9 endpoint [%i,%i,%i]\n",
+				       mqx_endpoint_a9.core,
+				       mqx_endpoint_a9.node,
+				       mqx_endpoint_a9.port);
+			}
 		}
-        }
-        else {
-			printf("\nMCC Error[%d], mcc_recv\n", ret_value);
-			printf("M4 endpoint [%i,%i,%i]\n", mqx_endpoint_m4.core,
-			       mqx_endpoint_m4.node, mqx_endpoint_m4.port);
-			printf("A9 endpoint [%i,%i,%i]\n", mqx_endpoint_a9.core,
-			       mqx_endpoint_a9.node, mqx_endpoint_a9.port);
-        }
-
-    }
+	}
 }
 #endif
