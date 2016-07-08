@@ -56,6 +56,7 @@ uint32_t millis( void )
 uint32_t micros( void )
 {
 #ifdef	MICRO_SEC_BY_HWTIMER1
+	_sched_yield();
 	return (mqx_hwtimer_get_us());
 #else
 	return (_time_get_microseconds());
@@ -96,8 +97,9 @@ void delayMicroseconds(uint32_t usec){
 
 	uint32_t start_us, end_us, elapsed_us;
 
-	start_us = micros();
 	elapsed_us = 0;
+	start_us = micros();
+
 	while (elapsed_us < usec)
 	{
 		end_us = micros();
