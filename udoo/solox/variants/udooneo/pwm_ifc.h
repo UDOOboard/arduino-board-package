@@ -100,6 +100,69 @@ typedef struct _pwm_setup_struct {
 extern "C" {
 #endif
 
+#ifdef INTERRUPT_VERSION_PWM
+////////////////////////////////////////////////////////////////////////////////
+// API
+////////////////////////////////////////////////////////////////////////////////
+
+/*!
+ * @brief Initialize PWM module.
+ *
+ * Sets up samples and pulse width.
+ * - Pulse Width = (prescale * period) / Fsrc (second)
+ * - Duty Cycle = sample[idx] / period
+ *
+ * @param instance the PWM instance number.
+ * @param pwm pointer to the pwm setting parameters structure.
+ *
+ * @retval TRUE on success
+ * @retval FALSE on fail
+ */
+int pwm_init(uint32_t instance);
+
+/*!
+ * @brief Setup interrupt service routine.
+ *
+ * The @a mask parameter should be composed of one or more of the below:
+ *    - #kPwmFifoEmptyIrq
+ *    - #kPwmRolloverIrq
+ *    - #kPwmCompareIrq
+ *
+ * @param instance the PWM instance number.
+ * @param irq_subroutine the PWM interrupt interrupt routine.
+ * @param mask mask of PWM interrupt bits to enable.
+ */
+void pwm_setup_interrupt(uint32_t instance, void (*irq_subroutine) (void *), uint8_t mask);
+
+/*!
+ * @brief Free interrupt service.
+ *
+ * @param instance the PWM instance number.
+ */
+void pwm_free_interrupt(uint32_t instance);
+
+/*!
+ * @brief Clear status that will issue interrupt.
+ *
+ * The @a mask parameter should be composed of one or more of the below:
+ *    - #kPwmFifoEmptyIrq
+ *    - #kPwmRolloverIrq
+ *    - #kPwmCompareIrq
+ *
+ * @param instance the PWM instance number.
+ * @param mask mask of PWM interrupt status bits to clear.
+ */
+void pwm_clear_int_status(uint32_t instance, uint32_t mask);
+
+/*!
+ * @brief PWM interrupt routine of FIFO empty.
+ *
+ * FIFO empty interrupt will set the global variable test_end as TRUE,
+ * which serves as a flag of ending PWM test.
+ */
+void pwm_isr_test_end(void);
+/// fefr end new version !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+#endif
 
 /*!
  * @brief Enable PWM output.

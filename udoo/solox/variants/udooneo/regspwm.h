@@ -32,6 +32,23 @@
 #define BM_PWM_PWMCR_PRESCALER      (0x0000fff0)  //!< Bit mask for PWM_PWMCR_PRESCALER.
 #define PWM_MAX_PRESCALER      		(0x00000fff)
 
+#ifdef INTERRUPT_VERSION_PWM
+
+#define BM_PWM_PWMSR_FE				(0x00000008)
+#define BM_PWM_PWMSR_ROV			(0x00000010)
+#define BM_PWM_PWMSR_CMP			(0x00000020)
+#define BM_PWM_PWMSR_FWE			(0x00000040)
+
+#define HW_PWM1						(0)
+#define HW_PWM2						(1)
+#define HW_PWM3						(2)
+#define HW_PWM4						(3)
+#define HW_PWM5						(4)
+#define HW_PWM6						(5)
+#define HW_PWM7						(6)
+#define HW_PWM8						(7)
+
+#endif
 //-------------------------------------------------------------------------------------------
 // HW_PWM_PWMCR - PWM Control Register
 //-------------------------------------------------------------------------------------------
