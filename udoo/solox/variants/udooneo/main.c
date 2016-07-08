@@ -37,8 +37,10 @@ static void main_task(uint32_t);
 extern void mqx_uart_receive_task(uint32_t);
 static void arduino_loop_task(uint32_t);
 static void arduino_yield_task (uint32_t);
-static void test_task (uint32_t);
+static void exit_task (uint32_t);
 extern void mqx_mccuart_receive_task (uint32_t);
+extern void mqx_uartclass_end_mcc (void);
+extern void deinit_hwtimer1 (void);
 
 //#define USER_TASK_ENABLED
 #ifdef USER_TASK_ENABLED
@@ -49,6 +51,7 @@ static void arduino_user_task3 (uint32_t);
 
 //#define MQX_LOG_TT
 #define ARDUINO_SERIAL_DEBUG_RX
+#define ADDR_SHARED_BYTE_FOR_M4STOP 		0xbff0ffff	// byte wrote by m4_stop tool to force M4 scketch to secure exit
 
 // ----------------------------------------------------------------------------------------------
 // if a task with high priority make a loop without delay or other wait,
@@ -56,37 +59,55 @@ static void arduino_user_task3 (uint32_t);
 // ----------------------------------------------------------------------------------------------
 const TASK_TEMPLATE_STRUCT  MQX_template_list[] =
 {
-    /* Task Index, 	Function,  				Stack, 	Priority, 	Name,   	Attributes,          	Param, Time Slice */
-    { 1,			main_task,				1500,	8,			"main",				MQX_AUTO_START_TASK,	0,     0 },
-    { 2,			arduino_loop_task,		1500,	9,			"arduino_loop",		0,						0,     0 },
-    { 3,			mqx_uart_receive_task,	1500,	9,			"uartrx",			0,						0,     0 },
-    { 4,			arduino_yield_task,		1500,	9,			"arduino_yield",	0,						0,     0 },
-    { 5,			test_task,				1500,	9,			"test",				0,						0,     0 },
+	/*      TaskIndex,               Function,                  Stack,  Priority,  Name,             Attributes,           Param,  TimeSlice  */
+	{       1,                       main_task,                 1500,   8,         "main",           MQX_AUTO_START_TASK,  0,      0          },
+	{       2,                       arduino_loop_task,         1500,   9,         "arduino_loop",   0,                    0,      0          },
+	{       3,                       mqx_uart_receive_task,     1500,   9,         "uartrx",         0,                    0,      0          },
+	{       4,                       arduino_yield_task,        1500,   9,         "arduino_yield",  0,                    0,      0          },
+	{       5,                       exit_task,                 1500,   9,         "exit",           0,                    0,      0          },
 #ifdef ARDUINO_SERIAL_DEBUG_RX
-    { 6,			mqx_mccuart_receive_task,	1500,	9,			"mccrx",			0,						0,     0 },
+	{       6,                       mqx_mccuart_receive_task,  1500,   9,         "mccrx",          0,                    0,      0          },
 #endif
 #ifdef USER_TASK_ENABLED
-    { 7,			arduino_user_task1,		1500,	9,			"user_task1",		0,						0,     0 },
-    { 8,			arduino_user_task2,		1500,	9,			"user_task2",		0,						0,     0 },
-    { 9,			arduino_user_task3,		1500,	9,			"user_task3",		0,						0,     0 },
+	{       7,                       arduino_user_task1,        1500,   9,         "user_task1",     0,                    0,      0          },
+	{       8,                       arduino_user_task2,        1500,   9,         "user_task2",     0,                    0,      0          },
+	{       9,                       arduino_user_task3,        1500,   9,         "user_task3",     0,                    0,      0          },
 #endif
-    { 0 }
+	{ 0 }
 };
 
-static void test_task
+static _task_id loop_task_id = MQX_NULL_TASK_ID;
+static _task_id yield_task_id = MQX_NULL_TASK_ID;
+static _task_id exit_task_id = MQX_NULL_TASK_ID;
+static _task_id main_task_id = MQX_NULL_TASK_ID;
+
+static void exit_task
     (
         uint32_t initial_data
     )
 {
-	uint32_t testCounter = 0;
+	bool endSketch = false;
+	do {
+		if (*((uint8_t *)ADDR_SHARED_BYTE_FOR_M4STOP) == 0xAA)
+			endSketch = true;
+		_time_delay(100);
+	}while (!endSketch);
+	printf("Received Stop M4 Sketch!\n");
 
-    printf("test_task is running!!\n");
+	// destroy tasks
+	_task_destroy(loop_task_id);
+	printf("_task_destroy(loop_task_id)\n");
+	_task_destroy(yield_task_id);
+	printf("_task_destroy(yield_task_id)\n");
+	_time_delay(100);
 
-    while (TRUE)  {
-    	testCounter++;
-    	printf("test_task=%d  initial_data=%d\n", testCounter, initial_data);
-    	_time_delay(500);
-    }
+	deinit_hwtimer1();
+	mqx_uartclass_end_mcc ();
+
+	printf("call _mqx_exit\n");
+	_time_delay(100);
+	_mqx_exit(1);
+	do {}while(1);
 }
 
 static void arduino_yield_task
@@ -115,11 +136,6 @@ static void arduino_loop_task
     	_sched_yield();
     	loop();
     	serialEventRun();
-/*
-    	testCounter++;
-    	printf("testCounterArdTask=%d\n", testCounter);
-    	_time_delay(100);
-*/
     }
 }
 
@@ -173,96 +189,71 @@ static void main_task
         uint32_t initial_data
     )
 {
-    _task_id created_task_id = MQX_NULL_TASK_ID;
-    bool endSketch = false;
 
     printf("\n\nmain_task is running...........\n");
+
+    // Create exit task
+    main_task_id = _task_create(0, 5, 0);
+    if (main_task_id == MQX_NULL_TASK_ID) {
+	    printf("\n Could not create exit task\n");
+	    _task_block();
+    } else {
+	    printf("Exit task created \n");
+    }
 
     // arduino init
     init();
     setup();
 
     // Create task for arduino loop()
-	created_task_id = _task_create(0, 2, 0);
-	if (created_task_id == MQX_NULL_TASK_ID) {
-		printf("\n Could not create arduino_loop_task\n");
-		_task_block();
-	} else {
-		printf("arduino_loop_task created \n");
-	}
+    loop_task_id = _task_create(0, 2, 0);
+    if (loop_task_id == MQX_NULL_TASK_ID) {
+	    printf("\n Could not create arduino_loop_task\n");
+	    _task_block();
+    } else {
+	    printf("arduino_loop_task created \n");
+    }
 
-#ifdef MQX_LOG_TT
-	// Create test task
-	created_task_id = _task_create(0, 5, 0);
-	if (created_task_id == MQX_NULL_TASK_ID) {
-		printf("\n Could not create test task\n");
-		_task_block();
-	} else {
-		printf("test task created \n");
-	}
-
-
-	created_task_id = _task_create(0, 5, 1);
-	if (created_task_id == MQX_NULL_TASK_ID) {
-		printf("\n Could not create test task second time\n");
-		_task_block();
-	} else {
-		printf("test task created second time\n");
-	}
-
-#endif
-
-
-	// Create task for arduino_yield
-	created_task_id = _task_create(0, 4, 0);
-	if (created_task_id == MQX_NULL_TASK_ID) {
-		printf("\n Could not create arduino_yield_task\n");
-		_task_block();
-	} else {
-		printf("arduino_yield_task created \n");
-	}
+    // Create task for arduino_yield
+    yield_task_id = _task_create(0, 4, 0);
+    if (yield_task_id == MQX_NULL_TASK_ID) {
+	    printf("\n Could not create arduino_yield_task\n");
+	    _task_block();
+    } else {
+	    printf("arduino_yield_task created \n");
+    }
 
 #ifdef USER_TASK_ENABLED
-	// Create user task1
-	created_task_id = _task_create(0, 7, 0);
-	if (created_task_id == MQX_NULL_TASK_ID) {
-		printf("\n Could not create user_task1\n");
-		_task_block();
-	} else {
-		printf("user task1 created \n");
-	}
+    // Create user task1
+    created_task_id = _task_create(0, 7, 0);
+    if (created_task_id == MQX_NULL_TASK_ID) {
+	    printf("\n Could not create user_task1\n");
+	    _task_block();
+    } else {
+	    printf("user task1 created \n");
+    }
 
-	// Create user task2
-	created_task_id = _task_create(0, 8, 0);
-	if (created_task_id == MQX_NULL_TASK_ID) {
-		printf("\n Could not create user_task2\n");
-		_task_block();
-	} else {
-		printf("user task2 created \n");
-	}
+    // Create user task2
+    created_task_id = _task_create(0, 8, 0);
+    if (created_task_id == MQX_NULL_TASK_ID) {
+	    printf("\n Could not create user_task2\n");
+	    _task_block();
+    } else {
+	    printf("user task2 created \n");
+    }
 
-	// Create user task3
-	created_task_id = _task_create(0, 9, 0);
-	if (created_task_id == MQX_NULL_TASK_ID) {
-		printf("\n Could not create user_task2\n");
-		_task_block();
-	} else {
-		printf("user task2 created \n");
-	}
+    // Create user task3
+    created_task_id = _task_create(0, 9, 0);
+    if (created_task_id == MQX_NULL_TASK_ID) {
+	    printf("\n Could not create user_task2\n");
+	    _task_block();
+    } else {
+	    printf("user task2 created \n");
+    }
 #endif
 
-	_time_delay(100);
-	do {
-		if (*((uint8_t *)0xbff0ffff) == 0xAA)
-			endSketch = true;
-		_time_delay(100);
-	}while (!endSketch);
-	//*((uint8_t *)0xbff0ffff) = 0; not work fine
-	printf("mqx_exit !!\n");
-	_time_delay(100);
-	_mqx_exit(1);
 
-	printf("main-task blocked !!\n");
-	_task_block();
+    printf("main-task blocked !!\n");
+    _task_block();
 }
 
