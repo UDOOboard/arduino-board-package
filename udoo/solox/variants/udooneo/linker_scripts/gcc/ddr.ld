@@ -3,11 +3,10 @@ EXTERN(main __vector_table ram_vector)
 
 MEMORY
 {
-	/*text        (RX): ORIGIN = 0x847D0000, LENGTH = 0x00020000	not work !!*/	/* for build clean.fw DDR */
-	/*text        (RX): ORIGIN = 0x847C0000, LENGTH = 0x00020000*/
+	/*text        (RX): ORIGIN = 0x847C0000, LENGTH = 0x00020000*/  /* for build clean.fw DDR */
 
 	text        (RX): ORIGIN = 0x84000000, LENGTH = 0x00080000		/* DDR */
-	data        (RW): ORIGIN = 0x20000000, LENGTH = 0x00007E00    	/* TCMU */
+  data        (RW): ORIGIN = 0x00901000, LENGTH = 0x0001E000    	/* OCRAM */
 }
 
 CODE_BASE_ADDR_START            = ORIGIN(text);
@@ -35,7 +34,7 @@ __SHARED_CM_IRAM_END            = 0x20920000;
 __SRAM_POOL_START               = 0x1FFF8010;    /* reserve first 4 word for reset (boot vector) */
 __SRAM_POOL_END                 = 0x20000000;
 
-__BOOT_STACK_ADDRESS            = 0x20008000;
+__BOOT_STACK_ADDRESS            = 0x0091FFFF;
 __KERNEL_DATA_END               = DATA_BASE_ADDR_END;
 
 SECTIONS
