@@ -237,5 +237,6 @@ void mqx_spi_end (void)
 			printf("Error uninstalling %s.\n", spiChannelsCS[SPI_INTERFACE-1]);
 			_task_block();
 		}
+		printf("Uninstall %s.\n", spiChannelsCS[SPI_INTERFACE-1]);
 	}
 }

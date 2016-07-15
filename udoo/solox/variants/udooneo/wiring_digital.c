@@ -72,6 +72,7 @@ const DioPinMap arduinoToMqx_Pin[ARD_NMAX_DIO] = {
 		{ARD_DIO13, 	ARD_DIO13_MUX_GPIO},		// 13
 };
 
+uint8_t ardPinsCfg[ARD_NMAX_DIO]={0};
 LWGPIO_STRUCT ardDio[ARD_NMAX_DIO];
 
 extern void pinMode( uint32_t ulPin, uint32_t ulMode )
@@ -90,15 +91,16 @@ extern void pinMode( uint32_t ulPin, uint32_t ulMode )
             }
             /* swich pin functionality (MUX) to GPIO mode */
             lwgpio_set_functionality(&ardDio[ulPin], arduinoToMqx_Pin[ulPin].mux);
-            uint32_t gf = lwgpio_get_functionality(&ardDio[ulPin]);
-			printf("lwgpio_get_functionality inputPin%d = %08X\n", ulPin, gf);
-            bool sa = lwgpio_set_attribute(&ardDio[ulPin], LWGPIO_ATTR_PULL_DOWN, LWGPIO_AVAL_ENABLE);
-			printf("lwgpio_set_attribute inputPin%d = %d\n", ulPin, sa);
+	    bool sa = lwgpio_set_attribute(&ardDio[ulPin],
+					   LWGPIO_ATTR_PULL_DOWN,
+					   LWGPIO_AVAL_ENABLE);
+            ardPinsCfg[ulPin] = digitalInputPulldown;
         break ;
 
         case INPUT_PULLUP:
             // opening pins for input
-            if (!lwgpio_init(&ardDio[ulPin], arduinoToMqx_Pin[ulPin].pin, LWGPIO_DIR_INPUT, LWGPIO_VALUE_NOCHANGE))
+	    if (!lwgpio_init(&ardDio[ulPin], arduinoToMqx_Pin[ulPin].pin,
+			     LWGPIO_DIR_INPUT, LWGPIO_VALUE_NOCHANGE))
             {
             	printf("Initializing LED1 GPIO as output failed.\n");
                 _task_block();
@@ -107,10 +109,12 @@ extern void pinMode( uint32_t ulPin, uint32_t ulMode )
             /* swich pin functionality (MUX) to GPIO mode */
             lwgpio_set_functionality(&ardDio[ulPin], arduinoToMqx_Pin[ulPin].mux);
             lwgpio_set_attribute(&ardDio[ulPin], LWGPIO_ATTR_PULL_UP, LWGPIO_AVAL_ENABLE);
+            ardPinsCfg[ulPin] = digitalInputPullup;
         break ;
 
         case OUTPUT:
-            if (!lwgpio_init(&ardDio[ulPin], arduinoToMqx_Pin[ulPin].pin, LWGPIO_DIR_OUTPUT, LWGPIO_VALUE_NOCHANGE))
+	    if (!lwgpio_init(&ardDio[ulPin], arduinoToMqx_Pin[ulPin].pin,
+			     LWGPIO_DIR_OUTPUT, LWGPIO_VALUE_NOCHANGE))
             {
             	printf("Initializing LED1 GPIO as output failed.\n");
                 _task_block();
@@ -118,6 +122,7 @@ extern void pinMode( uint32_t ulPin, uint32_t ulMode )
             }
             /* swich pin functionality (MUX) to GPIO mode */
             lwgpio_set_functionality(&ardDio[ulPin], arduinoToMqx_Pin[ulPin].mux);
+            ardPinsCfg[ulPin] = digitalOutput;
         break ;
 
         default:

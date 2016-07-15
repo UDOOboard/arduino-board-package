@@ -41,6 +41,9 @@ static void exit_task (uint32_t);
 extern void mqx_mccuart_receive_task (uint32_t);
 extern void mqx_uartclass_end_mcc (void);
 extern void deinit_hwtimer1 (void);
+extern void detachGPIO_Interrupt(void);
+extern void mqx_towire_uninstall (void);
+extern void mqx_spi_end (void);
 
 //#define USER_TASK_ENABLED
 #ifdef USER_TASK_ENABLED
@@ -94,6 +97,9 @@ static void exit_task
 	}while (!endSketch);
 	printf("Received Stop M4 Sketch!\n");
 
+	// disable gpio interrupt
+	detachGPIO_Interrupt();
+
 	// destroy tasks
 	_task_destroy(loop_task_id);
 	printf("_task_destroy(loop_task_id)\n");
@@ -103,6 +109,8 @@ static void exit_task
 
 	deinit_hwtimer1();
 	mqx_uartclass_end_mcc ();
+	mqx_towire_uninstall ();
+	mqx_spi_end ();
 
 	printf("call _mqx_exit\n");
 	_time_delay(100);

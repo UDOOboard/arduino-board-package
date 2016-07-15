@@ -188,7 +188,7 @@ void analogWrite(uint32_t ulPin, uint32_t ulValue) {
 
 	if (!PwmIsEnabled(pwmChn)) {
 		// PWM Startup code
-    	_bsp_pwm_io_init(pwmChn, 0xff);
+		_bsp_pwm_io_init(pwmChn, 0xff);
 		pwm_disable(pwmChn);
 		pwm_set_clock(pwmChn, kPwmClockSourceIpg);
 		pwm_set_fwm(pwmChn, DEF_PWM_FWM);
@@ -199,15 +199,12 @@ void analogWrite(uint32_t ulPin, uint32_t ulValue) {
 		pwm_set_repeat(pwmChn, DEF_PWM_REPEAT);
 		pwm_enable(pwmChn);
 
-		/*
-		printf("MY_HW_PWM_PWMPR(%d)=%08X\n", pwmChn, MY_HW_PWM_PWMPR(pwmChn).U);
-		printf("MY_HW_PWM_PWMCR(%d)=%08X\n", pwmChn, MY_HW_PWM_PWMCR(pwmChn).U);
-		printf("MY_HW_PWM_PWMSAR(%d)=%08X\n", pwmChn, MY_HW_PWM_PWMSAR(pwmChn).U);
-		*/
+		ardPinsCfg[ulPin] = pwm;
+
 	}
 
 	ulValue = mapPwmResolution(ulValue, (uint32_t)1<<_writeResolution, pwm_get_resolution(pwmChn));
-   	pwm_set_sample(pwmChn, (uint16_t)ulValue);
+	pwm_set_sample(pwmChn, (uint16_t)ulValue);
 }
 
 //-----------------------------------------
@@ -218,10 +215,12 @@ void InitPins(void) {
 
 	int i;
 
+	printf ("Disable PWMs\n");
 	for (i=PWM_CH0; i<=PWM_CH7; i++)
 		pwm_disable(i);
 	for (i=PWM_CH0; i<=PWM_CH7; i++)
 		_bsp_pwm_io_init(i, 0);
+	printf ("Configure pins in input\n");
 	for (i=0; i<ARD_NMAX_DIO; i++)
 		pinMode(i,INPUT);
 }

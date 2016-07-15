@@ -70,6 +70,21 @@ typedef struct _DioPinMap
 
 #define ARD_NMAX_DIO						14
 
+enum {
+	NONE=0,
+	digitalInputPulldown,
+	digitalInputPullup,
+	digitalOutput,
+	interruptLow,
+	interruptHigh,
+	interruptRising,
+	interruptFalling,
+	interruptChange,
+	pwm
+}eArdPinsCfg;
+
+extern uint8_t ardPinsCfg[ARD_NMAX_DIO];
+
 #ifdef __cplusplus
 }
 #endif

@@ -118,6 +118,7 @@ void mqx_towire_end (uint8_t i2cId)
 			printf("Error uninstalling %s.\n", _mqx_i2c_info[i2cId].namePtr);
 			_task_block();
 		}
+		printf("Uninstall %s.\n", _mqx_i2c_info[i2cId].namePtr);
 	}
 }
 
@@ -187,4 +188,13 @@ int32_t mqx_towire_setClock(uint8_t i2cId, uint32_t fr) {
 	result = ioctl (i2c_fd[i2cId], IO_IOCTL_I2C_SET_BAUD, &fr);
 
 	return (result);
+}
+
+void mqx_towire_uninstall (void)
+{
+	int i;
+
+	for (i=0; i<NMAX_I2C; i++) {
+		mqx_towire_end(i);
+	}
 }

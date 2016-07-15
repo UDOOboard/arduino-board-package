@@ -20,73 +20,69 @@
 
 #include "log_mqx.h"
 #include "WInterrupts.h"
+#include "wiring_digital.h"
 
 typedef void (*interruptCB)(void *);
+
+static uint8_t ardPinsCfgInterrupt[ARD_NMAX_DIO]={0};
 
 extern LWGPIO_STRUCT ardDio[ARD_NMAX_DIO];
 
 static interruptCB int_service_routine_ard_pin[ARD_NMAX_DIO];
 static void (*callback_ard_pin[ARD_NMAX_DIO])(void);
 
+#define INT_SERVICE_ROUTINE(pin, x) \
+		if (ardPinsCfg[x] == interruptChange) { \
+			if (ardPinsCfgInterrupt[x] == LWGPIO_INT_MODE_FALLING) \
+				ardPinsCfgInterrupt[x] = LWGPIO_INT_MODE_RISING; \
+			else \
+				ardPinsCfgInterrupt[x] = LWGPIO_INT_MODE_FALLING; \
+			lwgpio_int_init((LWGPIO_STRUCT_PTR)pin, ardPinsCfgInterrupt[x]); \
+		} \
+	    callback_ard_pin[x](); \
+	    lwgpio_int_clear_flag(&ardDio[x])
+
 static void int_service_routine0(void *pin) {
-
-//    lwgpio_int_clear_flag((LWGPIO_STRUCT_PTR) pin);
-    lwgpio_int_clear_flag(&ardDio[0]);
-    callback_ard_pin[0]();
+	INT_SERVICE_ROUTINE(pin, 0);
 }
-
 static void int_service_routine1(void *pin) {
-    lwgpio_int_clear_flag(&ardDio[1]);
-    callback_ard_pin[1]();
+	INT_SERVICE_ROUTINE(pin, 1);
 }
-
 static void int_service_routine2(void *pin) {
-    lwgpio_int_clear_flag(&ardDio[2]);
-    callback_ard_pin[2]();
+	INT_SERVICE_ROUTINE(pin, 2);
 }
 static void int_service_routine3(void *pin) {
-    lwgpio_int_clear_flag(&ardDio[3]);
-    callback_ard_pin[3]();
+	INT_SERVICE_ROUTINE(pin, 3);
 }
 static void int_service_routine4(void *pin) {
-    lwgpio_int_clear_flag(&ardDio[4]);
-    callback_ard_pin[4]();
+	INT_SERVICE_ROUTINE(pin, 4);
 }
 static void int_service_routine5(void *pin) {
-    lwgpio_int_clear_flag(&ardDio[5]);
-    callback_ard_pin[5]();
+	INT_SERVICE_ROUTINE(pin, 5);
 }
 static void int_service_routine6(void *pin) {
-    lwgpio_int_clear_flag(&ardDio[6]);
-    callback_ard_pin[6]();
+	INT_SERVICE_ROUTINE(pin, 6);
 }
 static void int_service_routine7(void *pin) {
-    lwgpio_int_clear_flag(&ardDio[7]);
-    callback_ard_pin[7]();
+	INT_SERVICE_ROUTINE(pin, 7);
 }
 static void int_service_routine8(void *pin) {
-    lwgpio_int_clear_flag(&ardDio[8]);
-    callback_ard_pin[8]();
+	INT_SERVICE_ROUTINE(pin, 8);
 }
 static void int_service_routine9(void *pin) {
-    lwgpio_int_clear_flag(&ardDio[9]);
-    callback_ard_pin[9]();
+	INT_SERVICE_ROUTINE(pin, 9);
 }
 static void int_service_routine10(void *pin) {
-    lwgpio_int_clear_flag(&ardDio[10]);
-    callback_ard_pin[10]();
+	INT_SERVICE_ROUTINE(pin, 10);
 }
 static void int_service_routine11(void *pin) {
-    lwgpio_int_clear_flag(&ardDio[11]);
-    callback_ard_pin[11]();
+	INT_SERVICE_ROUTINE(pin, 11);
 }
 static void int_service_routine12(void *pin) {
-    lwgpio_int_clear_flag(&ardDio[12]);
-    callback_ard_pin[12]();
+	INT_SERVICE_ROUTINE(pin, 12);
 }
 static void int_service_routine13(void *pin) {
-    lwgpio_int_clear_flag(&ardDio[13]);
-    callback_ard_pin[13]();
+	INT_SERVICE_ROUTINE(pin, 13);
 }
 
 /* Configure PIO interrupt sources */
@@ -95,6 +91,7 @@ static void __initialize() {
 	for (i=0; i<ARD_NMAX_DIO; i++) {
 		int_service_routine_ard_pin[i] = NULL;
 		callback_ard_pin[i] = NULL;
+		ardPinsCfg[i] = 0;
 	}
 	int_service_routine_ard_pin[0] = int_service_routine0;
 	int_service_routine_ard_pin[1] = int_service_routine1;
@@ -118,35 +115,32 @@ void attachInterrupt(uint32_t pin, void (*callback)(void), uint32_t mode)
 	static int enabled = 0;
 	LWGPIO_INT_MODE intMode = LWGPIO_INT_MODE_NONE;
 
-	switch (mode) {
-	case LOW: intMode = LWGPIO_INT_MODE_LOW;break;
-	case HIGH: intMode = LWGPIO_INT_MODE_HIGH;break;
-	case FALLING: intMode = LWGPIO_INT_MODE_FALLING;break;
-	case RISING: intMode = LWGPIO_INT_MODE_RISING;break;
-	//case CHANGE:
-	}
-
 	if (pin >= ARD_NMAX_DIO) return;
+
 	if (!enabled) {
 		__initialize();
 		enabled = 1;
 	}
-	//printf("attachInterrupt() pin=%d  mode=%d\n", pin, mode);
 
-/* //configured in pinmode()
-// opening pins for input
-if (!lwgpio_init(&ardDio[pin], arduinoToMqx_Pin[pin].pin, LWGPIO_DIR_INPUT, LWGPIO_VALUE_NOCHANGE))
-{
-	printf("Initializing button GPIO as input failed.\n");
-	_task_block();
-}
-    lwgpio_set_functionality(&ardDio[pin], arduinoToMqx_Pin[pin].mux);
-#if defined(BSP_BUTTONS_ACTIVE_HIGH)
-    lwgpio_set_attribute(&ardDio[pin], LWGPIO_ATTR_PULL_DOWN, LWGPIO_AVAL_ENABLE);
-#else
-    lwgpio_set_attribute(&ardDio[pin], LWGPIO_ATTR_PULL_UP, LWGPIO_AVAL_ENABLE);
-#endif
-*/
+	switch (mode) {
+	case LOW: intMode = LWGPIO_INT_MODE_LOW; ardPinsCfg[pin] = interruptLow; break;
+	case HIGH: intMode = LWGPIO_INT_MODE_HIGH; ardPinsCfg[pin] = interruptHigh; break;
+	case FALLING: intMode = LWGPIO_INT_MODE_FALLING; ardPinsCfg[pin] = interruptFalling; break;
+	case RISING: intMode = LWGPIO_INT_MODE_RISING; ardPinsCfg[pin] = interruptRising; break;
+	case CHANGE:
+		ardPinsCfg[pin] = interruptChange;
+		if (digitalRead(pin) == HIGH) {
+			intMode = LWGPIO_INT_MODE_FALLING;
+			ardPinsCfgInterrupt[pin] = LWGPIO_INT_MODE_FALLING;
+		}
+		else {
+			intMode = LWGPIO_INT_MODE_RISING;
+			ardPinsCfgInterrupt[pin] = LWGPIO_INT_MODE_RISING;
+		}
+		break;
+	}
+
+
 
     /* enable gpio functionality for given pin, react on falling/rising edge */
     if (!lwgpio_int_init(&ardDio[pin], intMode))
@@ -173,4 +167,25 @@ void detachInterrupt(uint32_t pin)
     /* disable interrupt on GPIO peripheral module */
     lwgpio_int_enable(&ardDio[pin], FALSE);
 	callback_ard_pin[pin] = NULL;
+	ardPinsCfg[pin] = 0;
+}
+void detachGPIO_Interrupt(void)
+{
+	uint16_t i, c, f;
+
+	c = f = 0;
+    /* disable interrupt on GPIO peripheral module */
+	for (i=0; i<ARD_NMAX_DIO; i++) {
+		f = 1;
+		c = (ardPinsCfg[i] == interruptLow) |
+			(ardPinsCfg[i] == interruptHigh) |
+			(ardPinsCfg[i] == interruptFalling) |
+			(ardPinsCfg[i] == interruptRising) |
+			(ardPinsCfg[i] == interruptChange);
+		if (c) {
+			detachInterrupt(i);
+		}
+	}
+	if (f == 1)
+		printf("detach GPIO interrupts \n");
 }
