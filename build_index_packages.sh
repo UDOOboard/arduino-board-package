@@ -90,7 +90,7 @@ declare -a TOOLS
 TOOLS=( udooclient gcc-arm-none-eabi bossac-udoo )
 
 declare -a PACKAGEHOST
-PACKAGEHOST=( i686-mingw32 x86_64-apple-darwin x86_64-pc-linux-gnu i686-pc-linux-gnu )
+PACKAGEHOST=( i686-mingw32 i386-apple-darwin11 x86_64-apple-darwin x86_64-pc-linux-gnu i686-pc-linux-gnu )
 
 declare -A PACKAGEVERSION
 PACKAGEVERSION[udooclient]="1.0"
