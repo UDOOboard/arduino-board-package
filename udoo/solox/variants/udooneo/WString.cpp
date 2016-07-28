@@ -21,7 +21,7 @@
 
 #include "WString.h"
 #include "itoa.h"
-#include "avr/dtostrf.h"
+#include "dtostrf.h"
 
 #define STRING_STACK_SIZE	255
 
