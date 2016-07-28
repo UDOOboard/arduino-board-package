@@ -23,8 +23,6 @@
 #include "itoa.h"
 #include "dtostrf.h"
 
-#define STRING_STACK_SIZE	255
-
 /*********************************************/
 /*  Constructors                             */
 /*********************************************/
@@ -47,7 +45,7 @@ String::String(const __FlashStringHelper *pstr)
 	*this = pstr;
 }
 
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
+#if __cplusplus >= 201103L || defined(__GXX_EXPERIMENTAL_CXX0X__)
 String::String(String &&rval)
 {
 	init();
@@ -136,11 +134,6 @@ inline void String::init(void)
 	buffer = NULL;
 	capacity = 0;
 	len = 0;
-
-	buffer = (char *)malloc(STRING_STACK_SIZE+1);
-	if (buffer) {
-		capacity = STRING_STACK_SIZE;
-	}
 }
 
 void String::invalidate(void)
@@ -153,18 +146,26 @@ void String::invalidate(void)
 unsigned char String::reserve(unsigned int size)
 {
 	if (buffer && capacity >= size) return 1;
-	if (buffer == NULL) {
-		if (changeBuffer(size)) {
-			if (len == 0) buffer[0] = 0;
-			return 1;
-		}
+	if (changeBuffer(size)) {
+		if (len == 0) buffer[0] = 0;
+		return 1;
 	}
 	return 0;
 }
 
+void *String::myRealloc(void *ptr,size_t size) {
+    void *newptr;
+    if (size <= capacity)
+        return ptr;
+    newptr = malloc(size+1);
+    memcpy(newptr, ptr, capacity);
+    free(ptr);
+    return newptr;
+}
+
 unsigned char String::changeBuffer(unsigned int maxStrLen)
 {
-	char *newbuffer = (char *)malloc(maxStrLen + 1);
+	char *newbuffer = (char *)myRealloc(buffer, maxStrLen + 1);
 	if (newbuffer) {
 		buffer = newbuffer;
 		capacity = maxStrLen;
@@ -199,11 +200,11 @@ String & String::copy(const __FlashStringHelper *pstr, unsigned int length)
 	return *this;
 }
 
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
+#if __cplusplus >= 201103L || defined(__GXX_EXPERIMENTAL_CXX0X__)
 void String::move(String &rhs)
 {
 	if (buffer) {
-		if (capacity >= rhs.len) {
+		if (rhs && capacity >= rhs.len) {
 			strcpy(buffer, rhs.buffer);
 			len = rhs.len;
 			rhs.len = 0;
@@ -231,7 +232,7 @@ String & String::operator = (const String &rhs)
 	return *this;
 }
 
-#ifdef __GXX_EXPERIMENTAL_CXX0X__
+#if __cplusplus >= 201103L || defined(__GXX_EXPERIMENTAL_CXX0X__)
 String & String::operator = (String &&rval)
 {
 	if (this != &rval) move(rval);
