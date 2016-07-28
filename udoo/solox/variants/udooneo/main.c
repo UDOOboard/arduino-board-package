@@ -67,7 +67,7 @@ const TASK_TEMPLATE_STRUCT  MQX_template_list[] =
 	{       2,                       arduino_loop_task,         1500,   9,         "arduino_loop",   0,                    0,      0          },
 	{       3,                       mqx_uart_receive_task,     1500,   9,         "uartrx",         0,                    0,      0          },
 	{       4,                       arduino_yield_task,        1500,   9,         "arduino_yield",  0,                    0,      0          },
-	{       5,                       exit_task,                 1500,   9,         "exit",           0,                    0,      0          },
+	{       5,                       exit_task,                 1500,   8,         "exit",           0,                    0,      0          },
 #ifdef ARDUINO_SERIAL_DEBUG_RX
 	{       6,                       mqx_mccuart_receive_task,  1500,   9,         "mccrx",          0,                    0,      0          },
 #endif
