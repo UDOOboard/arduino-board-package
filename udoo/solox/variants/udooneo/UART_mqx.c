@@ -209,7 +209,6 @@ void mqx_uart_receive_task (uint32_t initial_data)
     while (TRUE)  {
 
     	int32_t res = read(serial_dev, &rxData, 1);
-    	printf("received char [%c]\n", rxData);
     	call_irq_handler(&Serial0, rxData);
 
     	/*

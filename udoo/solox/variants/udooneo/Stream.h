@@ -45,9 +45,6 @@ class Stream : public Print
     int peekNextDigit(); // returns the next numeric digit in the stream or -1 if timeout
 
   public:
-//    int timedRead();    // private method to read stream with timeout
-//    int timedPeek();    // private method to peek stream with timeout
-//    int peekNextDigit(); // returns the next numeric digit in the stream or -1 if timeout
 
     virtual int available() = 0;
     virtual int read() = 0;
