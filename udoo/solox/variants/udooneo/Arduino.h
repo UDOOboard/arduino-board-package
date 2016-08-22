@@ -115,7 +115,7 @@ typedef enum _EPWMChannel
 
 // delayMicroseconds() and micros() function are powered by hw_timer1
 #define MICRO_SEC_BY_HWTIMER1
-
+#define ARDUINO_UDOO_NEO
 
 /*
 // USB Device
