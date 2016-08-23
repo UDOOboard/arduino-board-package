@@ -43,11 +43,20 @@ extern void delay_finer( uint32_t dwMs ) ;
 // delay msec, this function not blocks other tasks
 #define delay(ms) _time_delay(ms)
 
-// delayMicroseconds, this function blocks other tasks
+// delayMicroseconds, this function not blocks other tasks
 void delayMicroseconds(uint32_t usec);
+
+// delayMicroseconds_finer,
+// this function blocks other tasks
+void delayMicroseconds_finer(uint32_t usec);
+
+// return microsec,
+// this function can be called in callback hooked from attachInterrupt
+extern uint32_t micros_finer( void ) ;
 
 #ifdef __cplusplus
 }
 #endif
 
 #endif /* _WIRING_ */
+// delay_finer function blocks all other tasks except exit_task

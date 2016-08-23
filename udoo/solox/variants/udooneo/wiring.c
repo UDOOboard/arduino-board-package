@@ -23,28 +23,6 @@
 extern "C" {
 #endif
 
-/*
-// -------------------------------------------
-// get the absolute time in milliseconds
-// if SECONDS > 4294967 then reset absolute time for avoid uint32_t overflow
-// the other option is to return uint64_t value
-// Not work: after reset, read always 0
-// -------------------------------------------
-uint32_t millis( void )
-{
-	TIME_STRUCT time;
-
-    _time_get_elapsed(&time);
-	if (time.SECONDS > 4294967ul) {
-		time.SECONDS = 0;
-		time.MILLISECONDS = 0;
-		_time_set(&time);
-		return (0);
-	}
-   	return (time.SECONDS * 1000 + time.MILLISECONDS);
-}
-*/
-
 uint32_t millis( void )
 {
 	TIME_STRUCT time;
@@ -62,35 +40,6 @@ uint32_t micros( void )
 	return (_time_get_microseconds());
 #endif
 }
-
-// This delay function blocks all other tasks !!!
-void delay_finer( uint32_t dwMs  )
-{
-	if (dwMs == 0)
-        return;
-    uint32_t start = millis();
-    do {} while (millis() - start < dwMs);
-}
-
-/* not work fine, reset time is variable ((1122, 3777), not 5000
-void delayMicroseconds(uint32_t usec){
-
-	uint32_t start_us, end_us, elapsed_us;
-	uint32_t usecTimeResolution;
-
-	start_us = _time_get_microseconds();
-	usecTimeResolution = _time_get_resolution() * 1000;
-	elapsed_us = 0;
-	do {
-		end_us = _time_get_microseconds();
-		if (end_us >= start_us)
-			elapsed_us += (end_us - start_us);
-		else
-			elapsed_us += (usecTimeResolution - start_us + end_us);
-		start_us = end_us;
-	}while (elapsed_us < usec);
-}
-*/
 
 #ifdef	MICRO_SEC_BY_HWTIMER1
 void delayMicroseconds(uint32_t usec){
@@ -118,6 +67,47 @@ void delayMicroseconds(uint32_t usec){
 	while (elapsed_us < usec)
 	{
 		end_us = _time_get_microseconds();
+		if (end_us > start_us)
+			elapsed_us += (end_us - start_us);
+		start_us = end_us;
+	}
+}
+#endif
+
+
+// -----------------------------------------------------------------------
+// delay_finer function blocks all other tasks except exit_task
+// -----------------------------------------------------------------------
+void delay_finer( uint32_t dwMs  )
+{
+	if (dwMs == 0)
+        return;
+    uint32_t start = millis();
+    do {} while (millis() - start < dwMs);
+}
+
+#ifdef	MICRO_SEC_BY_HWTIMER1
+// -----------------------------------------------------------------------
+// micros_finer can be called in callback hooked from attachInterrupt
+// -----------------------------------------------------------------------
+uint32_t micros_finer( void )
+{
+	return (mqx_hwtimer_get_us());
+}
+
+// -----------------------------------------------------------------------
+// delayMicroseconds_finer function blocks all other tasks except exit_task
+// ------------------------------------------------------------------------
+void delayMicroseconds_finer(uint32_t usec){
+
+	uint32_t start_us, end_us, elapsed_us;
+
+	elapsed_us = 0;
+	start_us = micros_finer();
+
+	while (elapsed_us < usec)
+	{
+		end_us = micros_finer();
 		if (end_us > start_us)
 			elapsed_us += (end_us - start_us);
 		start_us = end_us;
