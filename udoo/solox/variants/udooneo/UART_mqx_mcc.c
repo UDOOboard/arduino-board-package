@@ -153,11 +153,9 @@ void mqx_mccuart_receive_task (uint32_t initial_data)
 	MCC_MEM_SIZE num_of_received_bytes, cnt;
 	MCC_UART_MESSAGE msg;
 
+	AddMsk_Shared_RAM (ADDR_SHARED_TRACE_FLAGS, MSK10_SHARED_TRACE_FLAGS);
+
 	printf("mqx_mccuart_receive_task is running!!\n");
-
-	uint32_t testCounter = 0;
-
-	while (TRUE)  {
 
 		if (mccIsInitialized == TRUE) {
 

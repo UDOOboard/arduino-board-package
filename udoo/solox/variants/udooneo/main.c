@@ -89,6 +89,10 @@ static void exit_task
         uint32_t initial_data
     )
 {
+
+	AddMsk_Shared_RAM (ADDR_SHARED_TRACE_FLAGS, MSK7_SHARED_TRACE_FLAGS);
+
+	printf("exit_task is running!!\n");
 	bool endSketch = false;
 	do {
 		if (*((uint8_t *)ADDR_SHARED_BYTE_FOR_M4STOP) == 0xAA)
@@ -114,6 +118,9 @@ static void exit_task
 
 	printf("call _mqx_exit\n");
 	_time_delay(100);
+
+	AddMsk_Shared_RAM (ADDR_SHARED_TRACE_FLAGS, MSK12_SHARED_TRACE_FLAGS);
+
 	_mqx_exit(1);
 	do {}while(1);
 }
@@ -123,6 +130,8 @@ static void arduino_yield_task
         uint32_t initial_data
     )
 {
+
+	AddMsk_Shared_RAM (ADDR_SHARED_TRACE_FLAGS, MSK9_SHARED_TRACE_FLAGS);
 
     printf("arduino_yield_task is running!!\n");
 
@@ -137,6 +146,8 @@ static void arduino_loop_task
 )
 {
 	uint32_t testCounter = 0;
+
+	AddMsk_Shared_RAM (ADDR_SHARED_TRACE_FLAGS, MSK8_SHARED_TRACE_FLAGS);
 
     printf("arduino_loop_task is running!!\n");
 
@@ -197,6 +208,8 @@ static void main_task
         uint32_t initial_data
     )
 {
+
+    AddMsk_Shared_RAM (ADDR_SHARED_TRACE_FLAGS, MSK6_SHARED_TRACE_FLAGS);
 
     printf("\n\nmain_task is running...........\n");
 

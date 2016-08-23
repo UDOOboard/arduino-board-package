@@ -201,7 +201,8 @@ void mqx_uart_receive_task (uint32_t initial_data)
 {
 	uint8_t rxData;
 
-//	_time_delay(5000);		// start after initialization from arduino main is made
+	AddMsk_Shared_RAM (ADDR_SHARED_TRACE_FLAGS, MSK11_SHARED_TRACE_FLAGS);
+
 	printf("mqx_uart_receive_task is running!!\n");
 
 	uint32_t testCounter = 0;

@@ -1693,5 +1693,24 @@ void _mqx_init_task(uint32_t);
 #endif
 #endif
 
+//fefr test
+#define ADDR_SHARED_TRACE_FLAGS			0xbff0fff4
+#define MSK1_SHARED_TRACE_FLAGS			0x00000001		// toolchain_startup
+#define MSK2_SHARED_TRACE_FLAGS			0x00000002		// main
+#define MSK3_SHARED_TRACE_FLAGS			0x00000004		// _mqx
+#define MSK4_SHARED_TRACE_FLAGS			0x00000008		// _bsp_pre_init
+#define MSK5_SHARED_TRACE_FLAGS			0x00000010		// _bsp_init
+#define MSK6_SHARED_TRACE_FLAGS			0x00000020		// main_task is running
+#define MSK7_SHARED_TRACE_FLAGS			0x00000040		// exit_task is running
+#define MSK8_SHARED_TRACE_FLAGS			0x00000080		// arduino_loop_task is running
+#define MSK9_SHARED_TRACE_FLAGS			0x00000100		// arduino_yield_task is running
+#define MSK10_SHARED_TRACE_FLAGS		0x00000200		// mqx_mccuart_receive_task is running
+#define MSK11_SHARED_TRACE_FLAGS		0x00000400		// mqx_uart_receive_task is running
+#define MSK12_SHARED_TRACE_FLAGS		0x00000800		// _mqx_exit
+
+void AddMsk_Shared_RAM (uint32_t addr, uint32_t mask);
+void TraceOn_Shared_RAM (uint32_t addr, uint32_t data);
+void IncSharedRAM_Cnt (uint32_t addr);
+
 #endif
 /* EOF */
