@@ -136,6 +136,7 @@ static void arduino_yield_task
     printf("arduino_yield_task is running!!\n");
 
     while (TRUE)  {
+    	_sched_yield();
     	yield();
     }
 }
