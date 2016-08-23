@@ -21,6 +21,7 @@
 
 #include <mqx.h>
 #include <bsp.h>
+#include <mutex.h>
 //#include <fio.h>
 #include "mcc.h"
 #include "mcc_config.h"
@@ -46,6 +47,11 @@ static bool mccIsInitialized = FALSE;
 #ifdef ARDUINO_SERIAL_DEBUG_RX
 static _task_id serial_task_id_mcc = MQX_NULL_TASK_ID;
 #endif
+
+MUTEX_STRUCT   mcc_mutex;
+
+#define NMAX_MCC_SEND	5
+uint16_t mccSendCounter = 0;
 
 typedef struct mcc_uart_message
 {
@@ -81,6 +87,12 @@ int mqx_uartclass_init_mcc (void)
 	}
 #endif
 
+	/* Initialize the mutex */
+	if (_mutex_init(&mcc_mutex, NULL) != MQX_OK) {
+		printf("Initialize print mutex failed.\n");
+		_task_block();
+	}
+
 	_time_delay(100);
 
 	return (0);
@@ -92,7 +104,11 @@ void mqx_uartclass_end_mcc (void)
 		printf("call mqx_uartclass_end_mcc()\n");
 		_task_destroy (serial_task_id_mcc);
 		mcc_destroy_endpoint(&mqx_endpoint_m4);
+		// Destroy the mutex */
+		_mutex_destroy(&mcc_mutex);
 		mccIsInitialized = FALSE;
+
+		mccSendCounter = 0;
 	}
 }
 
@@ -106,7 +122,21 @@ int32_t mqx_uartclass_write_mcc (const uint8_t uc_data)
     int             ret_value;
 
 	if (mccIsInitialized == TRUE) {
+
+		if (_mutex_lock(&mcc_mutex) != MQX_OK) {
+			printf("Mutex lock failed.\n");
+			_task_block();
+		}
 		ret_value = mcc_send(&mqx_endpoint_m4, &mqx_endpoint_a9, (void *)&uc_data, 1, MCC_SEND_TIMEOUT);
+
+		mccSendCounter++;
+		if (mccSendCounter >= NMAX_MCC_SEND) {
+			mccSendCounter = 0;
+			_time_delay(1);
+		}
+
+		_mutex_unlock(&mcc_mutex);
+
 		if(MCC_SUCCESS != ret_value) {
 			printf("\nMCC Error[%d], sending the message using the send byte function failed\n", 
 			       ret_value);
@@ -127,7 +157,20 @@ int32_t mqx_uartclass_write_buffer_mcc (const uint8_t *ptr, uint16_t len)
 
 	if (mccIsInitialized == TRUE) {
 		//printf("mcc string = <%s> len = %d\r\n", ptr, len);
-		ret_value = mcc_send(&mqx_endpoint_m4, &mqx_endpoint_a9, (void *)ptr, len+1, MCC_SEND_TIMEOUT);
+		if (_mutex_lock(&mcc_mutex) != MQX_OK) {
+			printf("Mutex lock failed.\n");
+			_task_block();
+		}
+		ret_value = mcc_send(&mqx_endpoint_m4, &mqx_endpoint_a9,
+				     (void *)ptr, len+1, MCC_SEND_TIMEOUT);
+
+		mccSendCounter++;
+		if (mccSendCounter >= NMAX_MCC_SEND) {
+			mccSendCounter = 0;
+			_time_delay(1);
+		}
+
+		_mutex_unlock(&mcc_mutex);
 		if(MCC_SUCCESS != ret_value) {
 			printf("\nMCC Error[%d], sending the message using the send buffer function failed\n",
 			       ret_value);
@@ -157,8 +200,9 @@ void mqx_mccuart_receive_task (uint32_t initial_data)
 
 	printf("mqx_mccuart_receive_task is running!!\n");
 
-		if (mccIsInitialized == TRUE) {
+	while (TRUE)  {
 
+		if (mccIsInitialized == TRUE) {
 			ret_value = mcc_recv(&mqx_endpoint_a9, &mqx_endpoint_m4, &msg,
 					     sizeof(MCC_UART_MESSAGE), &num_of_received_bytes,
 					     0xffffffff);
