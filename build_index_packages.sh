@@ -67,6 +67,8 @@ scm_ver()
 
 ### VARIABLES
 
+unset DAEMON
+
 # get package script directory
 REPO_DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 SHA_DIR="${REPO_DIR}/packages"
@@ -77,7 +79,8 @@ PACKAGE_INDEX_FILE=`mktemp`
 _PACKAGE_INDEX_FILE="$REPO_DIR/build/package_udoo_index.json"
 
 # boards are served via github pages
-BOARD_DOWNLOAD_URL="https://udooboard.github.io/arduino-board-package"
+LOCAL_DOWNLOAD_URL="http://127.0.0.1:8080"
+REMOTE_DOWNLOAD_URL="https://udooboard.github.io/arduino-board-package"
 
 declare -a ARCHS
 ARCHS=( qdl neo )
@@ -224,7 +227,7 @@ function log() {
     *) ;;
   esac
 
-  echo $MOD ${COLOR}$@${RST}
+  echo $MOD "${COLOR}${*}${RST}"
 
   (( $EXIT )) && exit $EXIT
 
@@ -268,10 +271,37 @@ function archive() {
 
 }
 
+usage() {
+# $1 text
+# $2 exitcode
+
+  [[ -n $1 ]] && echo $1
+
+  cat <<-EOF
+		Usage: ${0##*/} [option]
+		
+		UDOO Arduino Board Package Index Builder
+		Options:
+		    -h                   Show this help
+		    -d|--daemon          For testing: execute a local http server
+		
+		EOF
+  exit ${2:-0}
+}
+
 cd $REPO_DIR
 
-#update platform version
-#sed -i .bak -e "s/^version=.*/version=$PACKAGE_VERSION/" hardware/adafruit/avr/platform.txt
+#argument parsing
+while (( $# )) 
+do 
+  case $1 in
+    -h|--help) usage ;;
+    -d|--daemon) DAEMON=1 ; shift ;;
+    *) 
+      # many arguments provided
+      usage "Too many arguments!" 1 ;;
+  esac
+done  
 
 #ek5
 #create packages
@@ -279,6 +309,13 @@ cd $REPO_DIR
 echo "$PACKAGES_HEADER" > $PACKAGE_INDEX_FILE
 
 unset ok_pkg
+
+if (( DAEMON ))
+then
+  BOARD_DOWNLOAD_URL="$LOCAL_DOWNLOAD_URL"
+else
+  BOARD_DOWNLOAD_URL="$REMOTE_DOWNLOAD_URL"
+fi
 
 #cycle every package
 for i in ${ARCHS[*]}
@@ -408,6 +445,16 @@ echo "$TOOLS_FOOTER" >> $PACKAGE_INDEX_FILE
 
 #let's beautify this json
 python -m json.tool < $PACKAGE_INDEX_FILE > $_PACKAGE_INDEX_FILE
+
+if (( DAEMON )) 
+then 
+
+  cd build
+  log "Serving testing board package at $BOARD_DOWNLOAD_URL/${_PACKAGE_INDEX_FILE##*/}"
+  ( python -m http.server 8080 ) 
+  cd -
+
+fi
 
 exit 0
 
