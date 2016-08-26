@@ -73,8 +73,6 @@ unset DAEMON
 REPO_DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 SHA_DIR="${REPO_DIR}/packages"
 
-PACKAGE_VERSION=`scm_ver`
-
 PACKAGE_INDEX_FILE=`mktemp`
 _PACKAGE_INDEX_FILE="$REPO_DIR/build/package_udoo_index.json"
 
@@ -260,12 +258,18 @@ function archive() {
 
   log pre "Building $arc..."
 
-  tar -jcf build/$arc -C $2 --exclude '*swp' --exclude '*~' --exclude '.git*' .
+  if [[ ! -f build/$arc ]] 
+  then
+
+    #create archive
+    tar -jcf "build/$arc" -C "$2" --exclude '*swp' --exclude '*~' --exclude '.git*' .
+  else
+    log pre "using cache file..."
+  fi
 
   shasize build/$arc sha size
 
   log "\t\tDone!"
-
   eval $__sha="'$sha'"
   eval $__size="'$size'"
 
@@ -313,40 +317,54 @@ unset ok_pkg
 if (( DAEMON ))
 then
   BOARD_DOWNLOAD_URL="$LOCAL_DOWNLOAD_URL"
+  TAGS=( $(git tag) boardmanager ) 
 else
   BOARD_DOWNLOAD_URL="$REMOTE_DOWNLOAD_URL"
+  TAGS=( $(git tag) ) 
 fi
 
-#cycle every package
-for i in ${ARCHS[*]}
-do
+#cycle tags
+for tags in ${TAGS[*]}
+do 
 
-  HARDWARE_FILES="udoo/${ARCHS_TARGET[$i]}"
-  BOARD_ARCHIVE_NAME="udoo$i-arduino-${ARCHS_TARGET[$i]}-$PACKAGE_VERSION"
-  PACKAGENAME="${BOARD_ARCHIVE_NAME}.tar.bz2"
-  DOWNLOADURL="${BOARD_DOWNLOAD_URL}/$PACKAGENAME"
+  git checkout -f $tags 
 
-  # create archives and get sha & size
-  archive "$BOARD_ARCHIVE_NAME" "$HARDWARE_FILES" PACKAGESHA PACKAGESIZE
- 
-  cd $REPO_DIR
- 
-  #put a comma on previous snippet
-  (( $ok_pkg )) && echo , >> $PACKAGE_INDEX_FILE
+  #cycle every package
+  for i in ${ARCHS[*]}
+  do
 
-  # fill in board json template
-  echo -n "${ARCHS_PKG[$i]}" | sed \
-    -e "s|PACKAGEVERSION|$PACKAGE_VERSION|g" \
-    -e "s|PACKAGENAME|$PACKAGENAME|g" \
-    -e "s|DOWNLOADURL|$DOWNLOADURL|g" \
-    -e "s|PACKAGESHA|$PACKAGESHA|g" \
-    -e "s|PACKAGESIZE|$PACKAGESIZE|g" >> $PACKAGE_INDEX_FILE
+    PACKAGE_VERSION=`scm_ver`
 
-  #first snippet ok, next will put comma
-  ok_pkg=1
+
+    HARDWARE_FILES="udoo/${ARCHS_TARGET[$i]}"
+    BOARD_ARCHIVE_NAME="udoo$i-arduino-${ARCHS_TARGET[$i]}-$PACKAGE_VERSION"
+    PACKAGENAME="${BOARD_ARCHIVE_NAME}.tar.bz2"
+    DOWNLOADURL="${BOARD_DOWNLOAD_URL}/$PACKAGENAME"
+
+    # create archives and get sha & size
+    archive "$BOARD_ARCHIVE_NAME" "$HARDWARE_FILES" PACKAGESHA PACKAGESIZE
+
+    cd $REPO_DIR
+
+    #put a comma on previous snippet
+    (( $ok_pkg )) && echo , >> $PACKAGE_INDEX_FILE
+
+    # fill in board json template
+    echo -n "${ARCHS_PKG[$i]}" | sed \
+      -e "s|PACKAGEVERSION|$PACKAGE_VERSION|g" \
+      -e "s|PACKAGENAME|$PACKAGENAME|g" \
+      -e "s|DOWNLOADURL|$DOWNLOADURL|g" \
+      -e "s|PACKAGESHA|$PACKAGESHA|g" \
+      -e "s|PACKAGESIZE|$PACKAGESIZE|g" >> $PACKAGE_INDEX_FILE
+
+    #first snippet ok, next will put comma
+    ok_pkg=1
+
+  done
+  #end package
 
 done
-#end package
+#end tags
 
 unset ok_pkg
 
