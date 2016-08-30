@@ -22,3 +22,6 @@
 [submodule "udoo/solox/libraries/TM1637"]
 	path = udoo/solox/libraries/TM1637
 	url = https://github.com/ektor5/TM1637
+[submodule "udoo/solox/libraries/DHT"]
+	path = udoo/solox/libraries/DHT
+	url = https://github.com/UDOOboard/DHT.git
