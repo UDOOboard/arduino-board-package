@@ -94,7 +94,7 @@ declare -a PACKAGEHOST
 PACKAGEHOST=( i686-mingw32 x86_64-apple-darwin x86_64-pc-linux-gnu i686-pc-linux-gnu )
 
 declare -A PACKAGEVERSION
-PACKAGEVERSION[udooclient]="1.0"
+PACKAGEVERSION[udooclient]="1.2"
 PACKAGEVERSION[bossac-udoo]="1.3a-1.0"
 PACKAGEVERSION[gcc-arm-none-eabi]="4.9-2014q4-20141203"
 
