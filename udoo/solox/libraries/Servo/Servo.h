@@ -54,9 +54,9 @@
 
 #define Servo_VERSION           2     // software version of this library
 
-#define MIN_PULSE_WIDTH       544ul     // the shortest pulse sent to a servo
-#define MAX_PULSE_WIDTH      2400ul     // the longest pulse sent to a servo
-#define DEFAULT_PULSE_WIDTH  1500ul     // default pulse width when servo is attached
+#define MIN_PULSE_WIDTH       544     // the shortest pulse sent to a servo
+#define MAX_PULSE_WIDTH      2400     // the longest pulse sent to a servo
+#define DEFAULT_PULSE_WIDTH  1500     // default pulse width when servo is attached
 
 #define MAX_SERVOS   8
 
