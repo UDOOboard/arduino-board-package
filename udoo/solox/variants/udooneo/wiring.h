@@ -34,7 +34,7 @@ extern void init( void ) ;
 extern uint32_t millis( void ) ;
 
 // return microsec
-// This number will overflow every ????
+// This number will overflow every 70 minutes
 extern uint32_t micros( void ) ;
 
 // delay msec, this function blocks other tasks
