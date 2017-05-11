@@ -62,12 +62,12 @@
 #include <lpm_imx6sx.h>
 #include <lpm.h>
 
-#include <spi_bsp_mqx.h>
+#include <spi.h>
 #include <spi_ecspi.h>
 #include <spi_slave_ecspi.h>
 
 #include <clk_api.h>
-#include <mu.h>
+//TCM #include <mu.h>
 
 #include <lpm_mcore.h>
 
@@ -85,7 +85,6 @@ _mqx_int _bsp_flexcan_io_init(_mqx_uint dev_num);
 _mqx_int _bsp_mcan_io_init(_mqx_uint dev_num);
 _mqx_int _bsp_ecspi_io_init( _mqx_uint dev_num, _mqx_uint flags);
 _mqx_int _bsp_ecspi_slave_io_init( _mqx_uint dev_num);
-_mqx_int _bsp_pwm_io_init( _mqx_uint dev_num, _mqx_uint flags);
 
 extern const LPM_CPU_OPERATION_MODE LPM_CPU_OPERATION_MODES[];
 
