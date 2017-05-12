@@ -46,9 +46,9 @@ build.extra_flags=
 #-DMQX_LOG -DMQX_EXTRA_LOG
 
 # These can be overridden in platform.local.txt
-compiler.c.extra_flags="-I{build.variant.path}/mqx/release/bsp" "-I{build.variant.path}/mqx/release/bsp/Sources" "-I{build.variant.path}/mqx/release" "-I{build.variant.path}/mqx/release/psp" "-I{build.variant.path}/mqx/release/mcc" "{compiler.define}"
+compiler.c.extra_flags="-I{build.variant.path}/mqx/release/bsp" "-I{build.variant.path}/mqx/release/bsp/Sources" "-I{build.variant.path}/mqx/release" "-I{build.variant.path}/mqx/release/psp" "-I{build.variant.path}/mqx/release/open-amp" "{compiler.define}"
 compiler.c.elf.extra_flags="-T{build.variant.path}/linker_scripts/gcc/libs.ld" 
-compiler.cpp.extra_flags="-I{build.variant.path}/mqx/release/bsp" "-I{build.variant.path}/mqx/release/bsp/Sources" "-I{build.variant.path}/mqx/release" "-I{build.variant.path}/mqx/release/psp" "-I{build.variant.path}/mqx/release/mcc" "{compiler.define}"
+compiler.cpp.extra_flags="-I{build.variant.path}/mqx/release/bsp" "-I{build.variant.path}/mqx/release/bsp/Sources" "-I{build.variant.path}/mqx/release" "-I{build.variant.path}/mqx/release/psp" "-I{build.variant.path}/mqx/release/open-amp" "{compiler.define}"
 compiler.ar.extra_flags=
 compiler.elf2hex.extra_flags=
 compiler.libsam.c.flags=
@@ -80,7 +80,7 @@ archive_file_path={build.path}/{archive_file}
 recipe.ar.pattern="{compiler.path}{compiler.ar.cmd}" {compiler.ar.flags} {compiler.ar.extra_flags} "{archive_file_path}" "{object_file}"
 
 #link all
-recipe.c.combine.pattern="{compiler.path}{compiler.c.elf.cmd}" -mcpu=cortex-m4 -march=armv7e-m -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16 -Os -fmessage-length=0 -ffunction-sections -fdata-sections  -g "-L{build.path}" "-L{build.variant.path}/mqx/release/psp" "-L{build.variant.path}/mqx/release/bsp" "-L{build.variant.path}/mqx/release/mcc" "-L/usr/lib/arm-none-eabi/lib/armv7e-m/fpu" "-T{build.variant.path}/{build.ldscript}" "-T{build.variant.path}/linker_scripts/gcc/libs.ld" -nostartfiles -nodefaultlibs -nostdlib -Xlinker --gc-sections "-Wl,-Map,{build.path}/{build.project_name}.map" -Xlinker --cref -z muldefs -o "{build.path}/{build.project_name}.elf" {compiler.combine.flags} {object_files}
+recipe.c.combine.pattern="{compiler.path}{compiler.c.elf.cmd}" -mcpu=cortex-m4 -march=armv7e-m -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16 -Os -fmessage-length=0 -ffunction-sections -fdata-sections  -g "-L{build.path}" "-L{build.variant.path}/mqx/release/psp" "-L{build.variant.path}/mqx/release/bsp" "-L{build.variant.path}/mqx/release/open-amp" "-L/usr/lib/arm-none-eabi/lib/armv7e-m/fpu" "-T{build.variant.path}/{build.ldscript}" "-T{build.variant.path}/linker_scripts/gcc/libs.ld" -nostartfiles -nodefaultlibs -nostdlib -Xlinker --gc-sections "-Wl,-Map,{build.path}/{build.project_name}.map" -Xlinker --cref -z muldefs -o "{build.path}/{build.project_name}.elf" {compiler.combine.flags} {object_files}
 # "{build.path}/{archive_file}"
 
 #-gdwarf-2 -gstrict-dwarf , indagare

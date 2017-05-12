@@ -39,9 +39,9 @@ class Print
     size_t printFloat(double, uint8_t);
   protected:
     void setWriteError(int err = 1) { write_error = err; }
-    bool is_mcc;
+    bool is_rpmsg;
   public:
-    Print() : write_error(0) {is_mcc=false;}
+    Print() : write_error(0) {is_rpmsg=false;}
 
     int getWriteError() { return write_error; }
     void clearWriteError() { setWriteError(0); }

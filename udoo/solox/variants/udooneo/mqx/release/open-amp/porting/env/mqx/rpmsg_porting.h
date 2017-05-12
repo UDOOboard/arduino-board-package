@@ -40,6 +40,6 @@
 #define RPMSG_PORTING_H_
 #include <stddef.h>
 #include <stdint.h>
-#include "rpmsg_platform_porting.h"
+#include "../../imx6sx_m4.mqx/rpmsg_platform_porting.h"
 
 #endif /* PRMSG_PORTING_H_ */

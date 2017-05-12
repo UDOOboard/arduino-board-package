@@ -42,7 +42,7 @@ class UARTClass : public HardwareSerial
       Mode_8M1 = 3,
       Mode_8S1 = 4
     };
-    UARTClass(RingBuffer* pRx_buffer, RingBuffer* pTx_buffer, bool mcc);
+    UARTClass(RingBuffer* pRx_buffer, RingBuffer* pTx_buffer, bool rpmsg);
     UARTClass(RingBuffer* pRx_buffer, RingBuffer* pTx_buffer);
 
     void begin(const uint32_t dwBaudRate);

@@ -16,7 +16,7 @@ GROUP (
 
 	bsp.a
 	psp.a
-	mcc.a
+	open-amp.a
 	libc.a
 	libm.a
 	libnosys.a

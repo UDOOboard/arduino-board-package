@@ -22,17 +22,17 @@
 #include "UARTClass.h"
 
 #include "UART_mqx.h"
-#include "UART_mqx_mcc.h"
+#include "UART_mqx_rpmsg.h"
 
 #include "uty_mqx.h"
 
 #define ARDUINO_SERIAL_DEBUG_RX
 
 // Constructors ////////////////////////////////////////////////////////////////
-UARTClass::UARTClass(RingBuffer *pRx_buffer, RingBuffer *pTx_buffer, bool mcc) {
+UARTClass::UARTClass(RingBuffer *pRx_buffer, RingBuffer *pTx_buffer, bool rpmsg) {
 	_rx_buffer = pRx_buffer;
 	_tx_buffer = pTx_buffer;
-	is_mcc = mcc;
+	is_rpmsg = rpmsg;
 }
 
 UARTClass::UARTClass(RingBuffer *pRx_buffer, RingBuffer *pTx_buffer) {
@@ -56,19 +56,19 @@ void UARTClass::init(const uint32_t dwBaudRate, const uint32_t modeReg) {
 	_rx_buffer->_iHead = _rx_buffer->_iTail = 0;
 	_tx_buffer->_iHead = _tx_buffer->_iTail = 0;
 
-	if (!is_mcc)
+	if (!is_rpmsg)
 		mqx_uartclass_init(dwBaudRate, modeReg);
 	else
-		mqx_uartclass_init_mcc();
+		mqx_uartclass_init_rpmsg();
 }
 
 void UARTClass::end(void) {
 	// Clear any received data
 	_rx_buffer->_iHead = _rx_buffer->_iTail;
-	if (!is_mcc)
+	if (!is_rpmsg)
 		mqx_uartclass_end ();
 	else
-		mqx_uartclass_end_mcc ();
+		mqx_uartclass_end_rpmsg ();
 }
 
 
@@ -94,7 +94,7 @@ int UARTClass::availableForWrite(void) {
 int UARTClass::peek(void) {
 
 #ifndef ARDUINO_SERIAL_DEBUG_RX
-	if (is_mcc) return (0);
+	if (is_rpmsg) return (0);
 #endif
 
 	if (_rx_buffer->_iHead == _rx_buffer->_iTail)
@@ -106,7 +106,7 @@ int UARTClass::peek(void) {
 int UARTClass::read(void) {
 
 #ifndef ARDUINO_SERIAL_DEBUG_RX
-	if (is_mcc) return (0);
+	if (is_rpmsg) return (0);
 #endif
 
 	// if the head isn't ahead of the tail, we don't have any characters
@@ -121,20 +121,20 @@ int UARTClass::read(void) {
 
 void UARTClass::flush(void) {
 
-	if (!is_mcc)
+	if (!is_rpmsg)
 		mqx_uartclass_flush ();
 	else
-		mqx_uartclass_flush_mcc();
+		mqx_uartclass_flush_rpmsg();
 }
 
 size_t UARTClass::write(const uint8_t uc_data) {
 
 	int32_t wrByte;
 
-	if (!is_mcc)
+	if (!is_rpmsg)
 		wrByte=mqx_uartclass_write (uc_data);
 	else
-		wrByte=mqx_uartclass_write_mcc (uc_data);
+		wrByte=mqx_uartclass_write_rpmsg (uc_data);
 
 	if (wrByte < 0)
 		return (0);

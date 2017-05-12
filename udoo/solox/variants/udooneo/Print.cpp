@@ -28,7 +28,7 @@
 #include "Print.h"
 
 #include "UART_mqx.h"
-#include "UART_mqx_mcc.h"
+#include "UART_mqx_rpmsg.h"
 
 // Public Methods //////////////////////////////////////////////////////////////
 
@@ -40,8 +40,8 @@ size_t Print::write(const uint8_t *buffer, size_t size)
 
 	if (size == 0) return (n);
 
-	if (is_mcc) {
-		n = mqx_uartclass_write_buffer_mcc (buffer, size);
+	if (is_rpmsg) {
+		n = mqx_uartclass_write_buffer_rpmsg (buffer, size);
 		if (n < 0) return (0);
 		return n;
 	}
