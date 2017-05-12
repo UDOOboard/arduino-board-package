@@ -39,7 +39,8 @@ static void arduino_loop_task(uint32_t);
 static void arduino_yield_task (uint32_t);
 static void exit_task (uint32_t);
 extern void mqx_mccuart_receive_task (uint32_t);
-extern void mqx_uartclass_end_mcc (void);
+extern void rpmsgTask(uint32_t param);
+extern void mqx_uartclass_end_rpmsg (void);
 extern void deinit_hwtimer1 (void);
 extern void detachGPIO_Interrupt(void);
 extern void mqx_towire_uninstall (void);
@@ -52,6 +53,7 @@ static void arduino_user_task2 (uint32_t);
 static void arduino_user_task3 (uint32_t);
 #endif
 
+#define RPMSG_TASK 100
 //#define MQX_LOG_TT
 #define ARDUINO_SERIAL_DEBUG_RX
 #define ADDR_SHARED_BYTE_FOR_M4STOP 		0xbff0ffff	// byte wrote by m4_stop tool to force M4 scketch to secure exit
@@ -76,6 +78,7 @@ const TASK_TEMPLATE_STRUCT  MQX_template_list[] =
 	{       8,                       arduino_user_task2,        1500,   9,         "user_task2",     0,                    0,      0          },
 	{       9,                       arduino_user_task3,        1500,   9,         "user_task3",     0,                    0,      0          },
 #endif
+	{ RPMSG_TASK,                    rpmsgTask,                 2048,   8,         "rpmsgTask",      0,                    0,      0          },
 	{ 0 }
 };
 
@@ -156,6 +159,11 @@ static void arduino_loop_task
     	_sched_yield();
     	loop();
     	serialEventRun();
+/*
+    	testCounter++;
+    	printf("testCounterArdTask=%d\n", testCounter);
+    	_time_delay(100);
+*/
     }
 }
 

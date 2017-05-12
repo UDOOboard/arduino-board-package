@@ -50,7 +50,6 @@
 
 #define USR_ENDPT 127
 #define TTY_ENDPT 126
-#define RPMSG_TASK 100
 
 static bool rpmsgIsInitialized = FALSE;
 struct remote_device *rdev = NULL;
@@ -96,7 +95,7 @@ void mqx_uartclass_init_rpmsg (void)
 
 #ifdef ARDUINO_SERIAL_DEBUG_RX
 	// Create task for uart rx
-	serial_task_id_rpmsg = _task_create(0, RPMSG_TASK, 0);
+	serial_task_id_rpmsg = _task_create(0, 6, 0);
 	if (serial_task_id_rpmsg == MQX_NULL_TASK_ID) {
 		printf("Could not create mqx_receive_task\n");
 		_task_block();
