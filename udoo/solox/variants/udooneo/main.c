@@ -115,7 +115,7 @@ static void exit_task
 	_time_delay(100);
 
 	deinit_hwtimer1();
-	mqx_uartclass_end_mcc ();
+	mqx_uartclass_end_rpmsg ();
 	mqx_towire_uninstall ();
 	mqx_spi_end ();
 

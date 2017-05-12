@@ -79,7 +79,7 @@
 #define _ENV_H_
 
 //TCM #include <stdio.h>
-#include "mqx/rpmsg_porting.h"
+#include "rpmsg_porting.h"
 
 /**
  * env_init

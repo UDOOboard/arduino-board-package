@@ -3,9 +3,8 @@ EXTERN(main __vector_table ram_vector)
 
 MEMORY
 {
-
-      text        (RX): ORIGIN = 0x84000000, LENGTH = 0x00040000  /* DDR */
-      data        (RW): ORIGIN = 0x84040000, LENGTH = 0x00040000  /* DDR */
+  text        (RX): ORIGIN = 0x84000000, LENGTH = 0x00080000		/* DDR */
+  data        (RW): ORIGIN = 0x00901000, LENGTH = 0x0001E000            /* OCRAM */
 }
 
 CODE_BASE_ADDR_START            = ORIGIN(text);
@@ -22,7 +21,7 @@ __DEFAULT_INTERRUPT_STACK_SIZE  = 1024;
 __ROM_END                       = CODE_BASE_ADDR_END;
 
 /* 64kB of shared memory at DDR */
-__SHARED_RAM_START              = 0xBff00000;
+__SHARED_RAM_START              = 0xBFF00000;
 __SHARED_RAM_END                = 0xBFF10000;
 
 /* define 4KB clock management share memory in RAM*/
@@ -33,7 +32,8 @@ __SHARED_CM_IRAM_END            = 0x20920000;
 __SRAM_POOL_START               = 0x1FFF8010;    /* reserve first 4 word for reset (boot vector) */
 __SRAM_POOL_END                 = 0x20000000;
 
-__BOOT_STACK_ADDRESS            = 0x20008000;
+/*__BOOT_STACK_ADDRESS            = 0x20008000;*/
+__BOOT_STACK_ADDRESS            = 0x0091FFFF;
 __KERNEL_DATA_END               = DATA_BASE_ADDR_END;
 
 SECTIONS
