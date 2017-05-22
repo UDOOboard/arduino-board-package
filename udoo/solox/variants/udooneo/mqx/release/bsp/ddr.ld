@@ -3,8 +3,8 @@ EXTERN(main __vector_table ram_vector)
 
 MEMORY
 {
-  text        (RX): ORIGIN = 0x84000000, LENGTH = 0x00080000		/* DDR */
-  data        (RW): ORIGIN = 0x00901000, LENGTH = 0x0001E000            /* OCRAM */
+    text        (RX): ORIGIN = 0x84000000, LENGTH = 0x00080000        /* DDR */
+    data        (RW): ORIGIN = 0x00901000, LENGTH = 0x0001E000        /* OCRAM */
 }
 
 CODE_BASE_ADDR_START            = ORIGIN(text);

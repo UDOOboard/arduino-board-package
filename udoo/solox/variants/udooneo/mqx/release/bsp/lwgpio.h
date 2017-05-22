@@ -100,6 +100,9 @@ extern bool lwgpio_set_pin_output(LWGPIO_PIN_ID, LWGPIO_VALUE);
 extern bool lwgpio_toggle_pin_output(LWGPIO_PIN_ID);
 extern LWGPIO_VALUE lwgpio_get_pin_input(LWGPIO_PIN_ID);
 
+// fefr test
+void lwgpio_toggle_value_x(LWGPIO_STRUCT_PTR, uint32_t n);
+
 #ifdef __cplusplus
 }
 #endif
