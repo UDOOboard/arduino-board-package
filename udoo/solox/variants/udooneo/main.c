@@ -23,6 +23,10 @@
 *
 *END************************************************************************/
 
+/*
+Modificato per RPMSG !!!!!!!!!!!!!!!!!!
+*/
+
 #include "mqx.h"
 #include "bsp.h"
 
@@ -55,7 +59,6 @@ static void arduino_user_task3 (uint32_t);
 
 #define RPMSG_TASK 100
 //#define MQX_LOG_TT
-#define ARDUINO_SERIAL_DEBUG_RX
 #define ADDR_SHARED_BYTE_FOR_M4STOP 		0xbff0ffff	// byte wrote by m4_stop tool to force M4 scketch to secure exit
 
 // ----------------------------------------------------------------------------------------------
@@ -70,9 +73,7 @@ const TASK_TEMPLATE_STRUCT  MQX_template_list[] =
 	{       3,                       mqx_uart_receive_task,     1500,   9,         "uartrx",         0,                    0,      0          },
 	{       4,                       arduino_yield_task,        1500,   9,         "arduino_yield",  0,                    0,      0          },
 	{       5,                       exit_task,                 1500,   8,         "exit",           0,                    0,      0          },
-#ifdef ARDUINO_SERIAL_DEBUG_RX
 	{       6,                       mqx_mccuart_receive_task,  1500,   9,         "mccrx",          0,                    0,      0          },
-#endif
 #ifdef USER_TASK_ENABLED
 	{       7,                       arduino_user_task1,        1500,   9,         "user_task1",     0,                    0,      0          },
 	{       8,                       arduino_user_task2,        1500,   9,         "user_task2",     0,                    0,      0          },
@@ -104,8 +105,20 @@ static void exit_task
 	}while (!endSketch);
 	printf("Received Stop M4 Sketch!\n");
 
+	//******************************************************************
+	// Con RPMSG, non posso chiamare le funzioni di deinit perchè dopo
+	// la chiamata a rpmsg_rtos_init, M4 rimane lockato su un semaforo HW
+	// che impedisce di chiamare le varie destroy etc. Non funziona neanche 
+	// la  rpmsg_rtos_deinit.
+	// Questo non è un problema perchè exit_task è stato implementato per
+	// risolvere i problemi di reload dello scketch M4 con MCC che adesso
+	// è stato sostituito da RPMSG
+	// *****************************************************************
+	AddMsk_Shared_RAM (ADDR_SHARED_TRACE_FLAGS, MSK12_SHARED_TRACE_FLAGS);
+	do {}while(1);
+/*
 	// disable gpio interrupt
-	detachGPIO_Interrupt();
+	//fefr oggi detachGPIO_Interrupt();
 
 	// destroy tasks
 	_task_destroy(loop_task_id);
@@ -115,7 +128,8 @@ static void exit_task
 	_time_delay(100);
 
 	deinit_hwtimer1();
-	mqx_uartclass_end_rpmsg ();
+printf("fefr oggi dopo deinit_hwtimer1()\n");
+	//mqx_uartclass_end_rpmsg ();
 	mqx_towire_uninstall ();
 	mqx_spi_end ();
 
@@ -126,6 +140,7 @@ static void exit_task
 
 	_mqx_exit(1);
 	do {}while(1);
+*/
 }
 
 static void arduino_yield_task

@@ -64,7 +64,7 @@
 #ifndef __RPMSG_RTOS_H
 #define __RPMSG_RTOS_H
 
-#include "rpmsg.h"
+#include "../rpmsg/rpmsg.h"
 
 //! @addtogroup rpmsg_rtos
 //! @{
