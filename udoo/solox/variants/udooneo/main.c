@@ -113,8 +113,12 @@ static void exit_task
 	// Questo non è un problema perchè exit_task è stato implementato per
 	// risolvere i problemi di reload dello scketch M4 con MCC che adesso
 	// è stato sostituito da RPMSG
+	// -----------------------------------------------------------------
+	// Ho aggiunto _mqx_exit altrimenti funzionava solo il reload dello 
+	// stesso sketch
 	// *****************************************************************
 	AddMsk_Shared_RAM (ADDR_SHARED_TRACE_FLAGS, MSK12_SHARED_TRACE_FLAGS);
+	_mqx_exit(1);	// to reload different sketch
 	do {}while(1);
 /*
 	// disable gpio interrupt
