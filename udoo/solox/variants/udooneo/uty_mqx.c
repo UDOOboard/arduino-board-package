@@ -37,3 +37,11 @@ void mqx_debug_str (uint8_t *str)
 	printf(str);
 }
 
+void mqx_debug_printf (const char* fmt, ...)
+{
+	va_list args;
+	va_start(args, fmt);
+	printf(fmt, args);
+	va_end(args);
+}
+

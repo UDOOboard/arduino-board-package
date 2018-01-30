@@ -17,14 +17,15 @@
  */
 
 #include <stdlib.h>
-#include <stdio.h>
 #include <string.h>
 #include "UARTClass.h"
 
 #include "UART_mqx.h"
 #include "UART_mqx_rpmsg.h"
 
+#include "mqx.h"
 #include "uty_mqx.h"
+#include "log_mqx.h"
 
 #define ARDUINO_SERIAL_DEBUG_RX
 
