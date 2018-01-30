@@ -45,10 +45,11 @@ Modificato per RPMSG !!!!!!!!!!!!!!!!!!
 //#define USR_ENDPT 127
 //#define TTY_ENDPT 126
 
-static bool rpmsgIsInitialized = FALSE;
+extern int SKETCH_RUNNING;
+extern int RPMSG_INIT; // 0=uninitialized; 1=initialized; 3+=initialized+rxcleared
+
 struct remote_device *rdev = NULL;
 struct rpmsg_channel *app_chnl = NULL;
-//struct rpmsg_endpoint *ept;
 
 static _task_id serial_task_id_rpmsg = MQX_NULL_TASK_ID;
 
@@ -63,21 +64,22 @@ void mqx_uartclass_init_rpmsg (void)
 
     // rpmsg driver init 
     ret_value = rpmsg_rtos_init(0 /*REMOTE_CPU_ID*/, &rdev, RPMSG_MASTER, &app_chnl);
+	// mqx_debug_int(1000, ret_value);
 
-	printf("Name service handshake is done, M4 has setup a rpmsg channel [%d ---> %d] rp_ept=%d\r\n", app_chnl->src, app_chnl->dst);
+	// mqx_debug_printf("Name service handshake is done, M4 has setup a rpmsg channel [%d ---> %d] rp_ept=%d\r\n", app_chnl->src, app_chnl->dst);
 
     if(RPMSG_SUCCESS != ret_value)
     {
-      printf("\n\n\nError, rpmsg init failed! Task is stopped now. Error code = %i\n", ret_value);
+      mqx_debug_printf("\n\n\nError, rpmsg init failed! Task is stopped now. Error code = %i\n", ret_value);
       _task_block();
     }
 
-    rpmsgIsInitialized = TRUE;
+	if (RPMSG_INIT == 0) RPMSG_INIT = 1;
 
 	// Create task for uart rx
 	serial_task_id_rpmsg = _task_create(0, 6, 0);
 	if (serial_task_id_rpmsg == MQX_NULL_TASK_ID) {
-		printf("Could not create mqx_receive_task\n");
+		mqx_debug_printf("Could not create mqx_receive_task\n");
 		_task_block();
 	} else {
 		printf("mqx_receive_task created \n");
@@ -86,9 +88,13 @@ void mqx_uartclass_init_rpmsg (void)
 
 void mqx_uartclass_end_rpmsg (void)
 {
-	if (rpmsgIsInitialized == TRUE) {
-		//rpmsg_rtos_deinit(rdev); 	
-		rpmsgIsInitialized = FALSE;
+	if (RPMSG_INIT > 0) {
+		_task_destroy(6);
+		_task_destroy(100);
+		printf("ho distrutto i task 6 e 100 di rpmsg\n");
+		// do not call deinit, otherwise M4 is locked on an HW sema4!
+		// rpmsg_rtos_deinit(rdev);
+		RPMSG_INIT = 0;
 	}
 }
 
@@ -101,7 +107,7 @@ int32_t mqx_uartclass_write_rpmsg (const uint8_t uc_data)
 {
   int             ret_value;
 
-  if (rpmsgIsInitialized == TRUE) {
+  if (RPMSG_INIT > 0) {
     // Send the message 
 	ret_value = rpmsg_rtos_send(app_chnl->rp_ept, &uc_data, sizeof(uc_data), app_chnl->dst);
     if(RPMSG_SUCCESS != ret_value) {
@@ -117,7 +123,7 @@ int32_t mqx_uartclass_write_buffer_rpmsg (const uint8_t *ptr, uint16_t len)
 {
   int             ret_value;
 
-  if (rpmsgIsInitialized == TRUE) {
+  if (RPMSG_INIT > 0) {
     // Send the whole buffer
 	ret_value = rpmsg_rtos_send(app_chnl->rp_ept, ptr, len, app_chnl->dst);
     if(RPMSG_SUCCESS != ret_value) {
@@ -135,24 +141,51 @@ extern struct UARTClass Serial;
 
 void mqx_mccuart_receive_task (uint32_t initial_data)
 {
-	int32_t ret_value;
-	int32_t num_of_received_bytes, cnt;
+	int32_t ret_value, received_bytes, i;
 	RPMSG_UART_MESSAGE msg;
+	printf("Task mqx_rpmsguart_receive_task is running!\n");
 
-	printf("mqx_rpmsguart_receive_task is running!!\n");
+    while (SKETCH_RUNNING)  {
 
-    while (TRUE)  {
+		ret_value = rpmsg_rtos_recv(app_chnl->rp_ept, &msg, &received_bytes, sizeof(msg), NULL, 0xFFFFFFFF);
 
-		ret_value = rpmsg_rtos_recv(app_chnl->rp_ept, &msg, &num_of_received_bytes, sizeof(msg), NULL, 0xFFFFFFFF);
-		//ret_value = rpmsg_rtos_recv(app_chnl->rp_ept, &msg, &num_of_received_bytes, sizeof(msg), NULL, 100);
+		if (RPMSG_SUCCESS == ret_value && received_bytes > 0) {
 
-		if(RPMSG_SUCCESS == ret_value) {
-		    printf("RPMSG received a msg from A9 endpoint  len=%d\n",
-		        num_of_received_bytes);
-			for (cnt=0; cnt<num_of_received_bytes; cnt++) {
-		    call_irq_handler(&Serial, msg.DATA[cnt]);
+		    // printf("RPMSG received a msg from A9 endpoint, len=%d\n", received_bytes);
+
+			if (RPMSG_INIT == 3 || RPMSG_INIT == 7) {
+				if (RPMSG_INIT == 3 && received_bytes == 1 && msg.DATA[i] == '0') {
+					// printf("Skipping 0 in HANDSHAKE!\n");
+					RPMSG_INIT = 7;
+					continue;
+				} else {
+					if (RPMSG_INIT == 7) {
+						if (received_bytes == 9 && msg.DATA[i] == 'x') {
+							// printf("Skipping HANDSHAKE (2)!\n");
+							RPMSG_INIT = 3;
+							continue;
+						} else {
+							call_irq_handler(&Serial, '0');
+						}
+					}
+				}
+			}
+
+			if (RPMSG_INIT >= 3) {
+				// printf("%d RECEIVED: data[0]=%c\n", RPMSG_INIT, msg.DATA[0]);
+				RPMSG_INIT = 15;
+				for (i=0; i<received_bytes; i++) {
+				    call_irq_handler(&Serial, msg.DATA[i]);
+				}
+			} else {
+				if (received_bytes == 9 || received_bytes == 10) {
+					// printf("Skipping HANDSHAKE (1)!\n");
+					RPMSG_INIT = 3;
+				}
 			}
 		}
     }
+
+	_task_block();
 }
 
