@@ -20,16 +20,11 @@
 // this file is a wrapper for call mqx api without conflict with stdio.h, stdlib.h
 // fio.h redefine write, read etc..
 
-/*
-Modificato per RPMSG !!!!!!!!!!!!!!!!!!
-*/
-
 #include <mqx.h>
 #include <bsp.h>
 #include <string.h>
-
+#include "udoomqx.h"
 #include "rpmsg/rpmsg_rtos.h"
-
 #include "log_mqx.h"
 
 #if ! BSPCFG_ENABLE_IO_SUBSYSTEM
@@ -37,13 +32,6 @@ Modificato per RPMSG !!!!!!!!!!!!!!!!!!
 #endif
 
 #define NODE_NUM			0ul
-
-//#define MCC_SEND_TIMEOUT	1000ul
-//static MCC_ENDPOINT    mqx_endpoint_m4 = {1,MCC_NODE_M4,MCC_PORT_M4};
-//static MCC_ENDPOINT    mqx_endpoint_a9 = {0,MCC_NODE_A9,MCC_PORT_A9};
-
-//#define USR_ENDPT 127
-//#define TTY_ENDPT 126
 
 extern int SKETCH_RUNNING;
 extern int RPMSG_INIT; // 0=uninitialized; 1=initialized; 3+=initialized+rxcleared
@@ -77,7 +65,7 @@ void mqx_uartclass_init_rpmsg (void)
 	if (RPMSG_INIT == 0) RPMSG_INIT = 1;
 
 	// Create task for uart rx
-	serial_task_id_rpmsg = _task_create(0, 6, 0);
+	serial_task_id_rpmsg = _task_create(0, TASK_RPMSGRX, 0);
 	if (serial_task_id_rpmsg == MQX_NULL_TASK_ID) {
 		mqx_debug_printf("Could not create mqx_receive_task\n");
 		_task_block();
@@ -89,9 +77,9 @@ void mqx_uartclass_init_rpmsg (void)
 void mqx_uartclass_end_rpmsg (void)
 {
 	if (RPMSG_INIT > 0) {
-		_task_destroy(6);
-		_task_destroy(100);
-		printf("ho distrutto i task 6 e 100 di rpmsg\n");
+		_task_destroy(TASK_RPMSGRX);
+		_task_destroy(TASK_RPMSG);
+		printf("RPMSG tasks %d and %d killed\n", TASK_RPMSGRX, TASK_RPMSG);
 		// do not call deinit, otherwise M4 is locked on an HW sema4!
 		// rpmsg_rtos_deinit(rdev);
 		RPMSG_INIT = 0;
@@ -139,13 +127,13 @@ struct UARTClass;
 void call_irq_handler (struct UARTClass* , uint8_t);
 extern struct UARTClass Serial;
 
-void mqx_mccuart_receive_task (uint32_t initial_data)
+void rpmsg_uart_rx_task(uint32_t initial_data)
 {
 	int32_t ret_value, received_bytes, i;
 	RPMSG_UART_MESSAGE msg;
-	printf("Task mqx_rpmsguart_receive_task is running!\n");
+	printf("TASK %s running...\n", __FUNCTION__);
 
-    while (SKETCH_RUNNING)  {
+	while (SKETCH_RUNNING)  {
 
 		ret_value = rpmsg_rtos_recv(app_chnl->rp_ept, &msg, &received_bytes, sizeof(msg), NULL, 0xFFFFFFFF);
 
@@ -184,7 +172,7 @@ void mqx_mccuart_receive_task (uint32_t initial_data)
 				}
 			}
 		}
-    }
+	}
 
 	_task_block();
 }

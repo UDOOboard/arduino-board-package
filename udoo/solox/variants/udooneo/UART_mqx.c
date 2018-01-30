@@ -22,7 +22,7 @@
 #include <mqx.h>
 #include <bsp.h>
 #include <fio.h>
-
+#include "udoomqx.h"
 #include "log_mqx.h"
 
 #if ! BSPCFG_ENABLE_IO_SUBSYSTEM
@@ -132,12 +132,11 @@ void mqx_uartclass_init (const uint32_t dwBaudRate, const uint32_t modeReg)
 #endif
 
 	// Create task for uart rx
-	serial_task_id = _task_create(0, 3, 0);
+	printf("Creating mqx_uart_rx_task...\n");
+	serial_task_id = _task_create(0, TASK_UARTRX, 0);
 	if (serial_task_id == MQX_NULL_TASK_ID) {
-		printf("Could not create mqx_uart_receive_task\n");
+		printf("ERROR: Could not create mqx_uart_rx_task!\n");
 		_task_block();
-	} else {
-		printf("mqx_uart_receive_task created \n");
 	}
 
 	return;
@@ -177,33 +176,17 @@ int32_t mqx_uartclass_write_buffer (const uint8_t *ptr, uint16_t len)
 	return (write(serial_dev, (uint8_t *)ptr, len));
 }
 
-/* not used, mqx_uart_receive_task is used
-int32_t mqx_uartclass_read (void)
-{
-	uint8_t rxData;
-
-//printf("serial statistiche\n");
-//StampaStatistiche();
-//return(0);
-
-	int32_t res = read(serial_dev, &rxData, 1);
-	//int32_t res = fread(&rxData, 1, 1, serial_dev);
-	if (res == 1) return (rxData);
-	return (res);
-}
-*/
-
 struct UARTClass;
 void call_irq_handler (struct UARTClass* , uint8_t);
 extern struct UARTClass Serial0;
 
-void mqx_uart_receive_task (uint32_t initial_data)
+void mqx_uart_rx_task(uint32_t initial_data)
 {
 	uint8_t rxData;
 
 	AddMsk_Shared_RAM (ADDR_SHARED_TRACE_FLAGS, MSK11_SHARED_TRACE_FLAGS);
 
-	printf("mqx_uart_receive_task is running!!\n");
+	printf("TASK %s running...\n", __FUNCTION__);
 
 	uint32_t testCounter = 0;
 
