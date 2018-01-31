@@ -113,15 +113,15 @@ static void exit_task(uint32_t initial_data)
 	// Ho aggiunto _mqx_exit altrimenti funzionava solo il reload dello 
 	// stesso sketch
 	// *****************************************************************
-	AddMsk_Shared_RAM (ADDR_SHARED_TRACE_FLAGS, MSK12_SHARED_TRACE_FLAGS);
-
 	mqx_uartclass_end_rpmsg();
 	_task_destroy(TASK_LOOP);
 	_task_destroy(TASK_YELD);
 	printf("->->-> Quitting MQX\n");
     _time_delay(100);
+	AddMsk_Shared_RAM (ADDR_SHARED_TRACE_FLAGS, MSK12_SHARED_TRACE_FLAGS);
+
 	_mqx_exit(1);	// to reload different sketch
-	do {}while(1);
+	do {} while(1);
 /*
 	// disable gpio interrupt
 	//fefr oggi detachGPIO_Interrupt();
@@ -152,7 +152,6 @@ printf("fefr oggi dopo deinit_hwtimer1()\n");
 static void arduino_yield_task(uint32_t initial_data)
 {
     printf("TASK %s running...\n", __FUNCTION__);
-
 	AddMsk_Shared_RAM (ADDR_SHARED_TRACE_FLAGS, MSK9_SHARED_TRACE_FLAGS);
 
     while (SKETCH_RUNNING)  {
@@ -160,15 +159,15 @@ static void arduino_yield_task(uint32_t initial_data)
     	yield();
     }
 
+	RemoveMsk_Shared_RAM (ADDR_SHARED_TRACE_FLAGS, MSK9_SHARED_TRACE_FLAGS);
 	_task_block();
 }
 
 static void arduino_loop_task(uint32_t initial_data)
 {
-	uint32_t testCounter = 0;
+//	uint32_t testCounter = 0;
 
     printf("TASK %s running...\n", __FUNCTION__);
-
 	AddMsk_Shared_RAM (ADDR_SHARED_TRACE_FLAGS, MSK8_SHARED_TRACE_FLAGS);
 
     while (SKETCH_RUNNING)  {
@@ -182,6 +181,7 @@ static void arduino_loop_task(uint32_t initial_data)
 */
     }
 
+	RemoveMsk_Shared_RAM (ADDR_SHARED_TRACE_FLAGS, MSK8_SHARED_TRACE_FLAGS);
 	_task_block();
 }
 
@@ -221,7 +221,6 @@ static void arduino_user_task3(uint32_t initial_data)
 static void main_task(uint32_t initial_data)
 {
     printf("TASK %s running...\n", __FUNCTION__);
-
     AddMsk_Shared_RAM (ADDR_SHARED_TRACE_FLAGS, MSK6_SHARED_TRACE_FLAGS);
 
 
@@ -285,6 +284,7 @@ static void main_task(uint32_t initial_data)
 #endif
 
     printf("%s: task blocked\n", __FUNCTION__);
+    RemoveMsk_Shared_RAM (ADDR_SHARED_TRACE_FLAGS, MSK6_SHARED_TRACE_FLAGS);
     _task_block();
 }
 
