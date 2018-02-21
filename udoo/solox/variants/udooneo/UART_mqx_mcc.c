@@ -192,13 +192,13 @@ struct UARTClass;
 void call_irq_handler (struct UARTClass* , uint8_t);
 extern struct UARTClass Serial;
 
-void mqx_mccuart_receive_task (uint32_t initial_data)
+void mqx_mccuart_rx_task(uint32_t initial_data)
 {
     int32_t ret_value;
     MCC_MEM_SIZE num_of_received_bytes, cnt;
     MCC_UART_MESSAGE msg;
 
-    printf("Task mqx_mccuart_receive_task is running!\n");
+    printf("TASK mqx_mccuart_rx_task is running!\n");
     AddMsk_Shared_RAM(ADDR_SHARED_TRACE_FLAGS, TRACE10_MCC_RX_TASK_RUN);
 
     while (SKETCH_RUNNING) {

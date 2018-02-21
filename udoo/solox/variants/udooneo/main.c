@@ -38,7 +38,7 @@ extern void mqx_uart_rx_task(uint32_t);
 static void arduino_loop_task(uint32_t);
 static void arduino_yield_task(uint32_t);
 static void exit_task(uint32_t);
-extern void mqx_mccuart_receive_task(uint32_t);
+extern void mqx_mccuart_rx_task(uint32_t);
 extern void mqx_uartclass_end_mcc(void);
 extern void deinit_hwtimer1(void);
 extern void detachGPIO_Interrupt(void);
