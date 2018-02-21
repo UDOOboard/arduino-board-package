@@ -28,7 +28,7 @@
 #include "mcc_api.h"
 #include "mcc_mqx.h"
 #include <string.h>
-
+#include "udoomqx.h"
 #include "log_mqx.h"
 
 #if ! BSPCFG_ENABLE_IO_SUBSYSTEM
@@ -78,7 +78,7 @@ int mqx_uartclass_init_mcc (void)
 
 #ifdef ARDUINO_SERIAL_DEBUG_RX
     // Create task for uart rx
-    serial_task_id_mcc = _task_create(0, 6, 0);
+    serial_task_id_mcc = _task_create(0, TASK_MCCRX, 0);
     if (serial_task_id_mcc == MQX_NULL_TASK_ID) {
         printf("Could not create mqx_receive_task\n");
         _task_block();
@@ -199,7 +199,7 @@ void mqx_mccuart_receive_task (uint32_t initial_data)
     MCC_UART_MESSAGE msg;
 
     printf("Task mqx_mccuart_receive_task is running!\n");
-    AddMsk_Shared_RAM (ADDR_SHARED_TRACE_FLAGS, TRACE10_MCC_RX_TASK_RUN);
+    AddMsk_Shared_RAM(ADDR_SHARED_TRACE_FLAGS, TRACE10_MCC_RX_TASK_RUN);
 
     while (SKETCH_RUNNING) {
 
@@ -227,6 +227,7 @@ void mqx_mccuart_receive_task (uint32_t initial_data)
         }
     }
 
+    RemoveMsk_Shared_RAM(ADDR_SHARED_TRACE_FLAGS, TRACE10_MCC_RX_TASK_RUN);
     _task_block();
 }
 #endif
