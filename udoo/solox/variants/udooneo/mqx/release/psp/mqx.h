@@ -1693,22 +1693,28 @@ void _mqx_init_task(uint32_t);
 #endif
 #endif
 
-//fefr test
-#define ADDR_SHARED_TRACE_FLAGS			0xbff0fff4
-#define MSK1_SHARED_TRACE_FLAGS			0x00000001		// toolchain_startup
-#define MSK2_SHARED_TRACE_FLAGS			0x00000002		// main
-#define MSK3_SHARED_TRACE_FLAGS			0x00000004		// _mqx
-#define MSK4_SHARED_TRACE_FLAGS			0x00000008		// _bsp_pre_init
-#define MSK5_SHARED_TRACE_FLAGS			0x00000010		// _bsp_init
-#define MSK6_SHARED_TRACE_FLAGS			0x00000020		// main_task is running
-#define MSK7_SHARED_TRACE_FLAGS			0x00000040		// exit_task is running
-#define MSK8_SHARED_TRACE_FLAGS			0x00000080		// arduino_loop_task is running
-#define MSK9_SHARED_TRACE_FLAGS			0x00000100		// arduino_yield_task is running
-#define MSK10_SHARED_TRACE_FLAGS		0x00000200		// mqx_mccuart_receive_task is running
-#define MSK11_SHARED_TRACE_FLAGS		0x00000400		// mqx_uart_receive_task is running
-#define MSK12_SHARED_TRACE_FLAGS		0x00000800		// _mqx_exit
+// shared ram trace flags
+#define ADDR_SHARED_RESTART_COUNTER      0xbff0fff8
+#define ADDR_SHARED_TRACE_FLAGS          0xbff0fff4
+
+#define TRACE01_TOOLCHAIN_STARTUP        0x00000001
+#define TRACE02_MAIN_CALLED              0x00000002
+#define TRACE03_MQX_STARTED              0x00000004
+#define TRACE04_BSP_PRE_INIT             0x00000008
+#define TRACE05_BSP_INIT                 0x00000010
+#define TRACE06_MAIN_TASK_RUN            0x00000020
+#define TRACE07_EXIT_TASK_RUN            0x00000040
+#define TRACE08_ARDUINO_LOOP_TASK_RUN    0x00000080
+#define TRACE09_ARDUINO_YIELD_TASK_RUN   0x00000100
+#define TRACE10_MCC_RX_TASK_RUN          0x00000200
+#define TRACE11_UART_RX_TASK_RUN         0x00000400
+#define TRACE12_MQX_EXIT                 0x00000800
+#define TRACE13_RPMSG_INIT_LOCKED        0x00001000
+#define TRACE14_RPMSG_TX_CHANNEL         0x00002000
+#define TRACE15_RPMSG_RX_TASK_RUN        0x00004000
 
 void AddMsk_Shared_RAM (uint32_t addr, uint32_t mask);
+void RemoveMsk_Shared_RAM (uint32_t addr, uint32_t mask);
 void TraceOn_Shared_RAM (uint32_t addr, uint32_t data);
 void IncSharedRAM_Cnt (uint32_t addr);
 

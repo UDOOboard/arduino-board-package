@@ -11,5 +11,6 @@ void mqx_debug_str (uint8_t *str);
 void mqx_sched_yield (void);
 void mqx_debug_int (int id, int d);
 void mqx_debug_str (uint8_t *str);
+void mqx_debug_printf (const char* fmt, ...);
 #endif
 #endif
