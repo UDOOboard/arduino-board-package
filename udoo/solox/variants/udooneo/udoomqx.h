@@ -9,5 +9,4 @@
 #define TASK_USER1					  7
 #define TASK_USER2					  8
 #define TASK_USER3					  9
-#define TASK_RPMSG					100
 
