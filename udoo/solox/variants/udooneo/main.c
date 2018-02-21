@@ -56,6 +56,9 @@ static void arduino_user_task3 (uint32_t);
 #define ARDUINO_SERIAL_DEBUG_RX
 #define ADDR_SHARED_BYTE_FOR_M4STOP 		0xbff0ffff	// byte wrote by m4_stop tool to force M4 scketch to secure exit
 
+extern int SKETCH_RUNNING;
+int SKETCH_RUNNING = 1;
+
 // ----------------------------------------------------------------------------------------------
 // if a task with high priority make a loop without delay or other wait,
 // then tasks with lower priority are blocked, also if _sched_yield() is called in the loop !!!!
@@ -89,17 +92,19 @@ static void exit_task
         uint32_t initial_data
     )
 {
+	printf("TASK %s running...\n", __FUNCTION__);
 
-	AddMsk_Shared_RAM (ADDR_SHARED_TRACE_FLAGS, MSK7_SHARED_TRACE_FLAGS);
+	AddMsk_Shared_RAM (ADDR_SHARED_TRACE_FLAGS, TRACE07_EXIT_TASK_RUN);
 
-	printf("exit_task is running!!\n");
 	bool endSketch = false;
 	do {
 		if (*((uint8_t *)ADDR_SHARED_BYTE_FOR_M4STOP) == 0xAA)
 			endSketch = true;
 		_time_delay(100);
-	}while (!endSketch);
+	} while (!endSketch);
+
 	printf("Received Stop M4 Sketch!\n");
+	SKETCH_RUNNING = 0;
 
 	// disable gpio interrupt
 	detachGPIO_Interrupt();
@@ -119,7 +124,9 @@ static void exit_task
 	printf("call _mqx_exit\n");
 	_time_delay(100);
 
-	AddMsk_Shared_RAM (ADDR_SHARED_TRACE_FLAGS, MSK12_SHARED_TRACE_FLAGS);
+	AddMsk_Shared_RAM (ADDR_SHARED_TRACE_FLAGS, TRACE12_MQX_EXIT);
+        printf("->->-> Quitting MQX\n");
+        _time_delay(100);
 
 	_mqx_exit(1);
 	do {}while(1);
@@ -130,15 +137,15 @@ static void arduino_yield_task
         uint32_t initial_data
     )
 {
+    printf("\n\nTask %s running...\n", __FUNCTION__);
+    AddMsk_Shared_RAM (ADDR_SHARED_TRACE_FLAGS, TRACE09_ARDUINO_YIELD_TASK_RUN);
 
-	AddMsk_Shared_RAM (ADDR_SHARED_TRACE_FLAGS, MSK9_SHARED_TRACE_FLAGS);
-
-    printf("arduino_yield_task is running!!\n");
-
-    while (TRUE)  {
+    while (SKETCH_RUNNING) {
     	_sched_yield();
     	yield();
     }
+
+    _task_block();
 }
 
 static void arduino_loop_task
@@ -146,17 +153,18 @@ static void arduino_loop_task
         uint32_t initial_data
 )
 {
-	uint32_t testCounter = 0;
+    uint32_t testCounter = 0;
 
-	AddMsk_Shared_RAM (ADDR_SHARED_TRACE_FLAGS, MSK8_SHARED_TRACE_FLAGS);
+    printf("TASK %s running...\n", __FUNCTION__);
+    AddMsk_Shared_RAM (ADDR_SHARED_TRACE_FLAGS, TRACE08_ARDUINO_LOOP_TASK_RUN);
 
-    printf("arduino_loop_task is running!!\n");
-
-    while (TRUE)  {
+    while (SKETCH_RUNNING) {
     	_sched_yield();
     	loop();
     	serialEventRun();
     }
+
+    _task_block();
 }
 
 static void arduino_user_task1
@@ -164,12 +172,13 @@ static void arduino_user_task1
         uint32_t initial_data
     )
 {
+    printf("TASK %s running...\n", __FUNCTION__);
 
-    printf("arduino_user_task1 is running!!\n");
-
-    while (TRUE)  {
+    while (SKETCH_RUNNING) {
     	user_task1();
     }
+
+    _task_block();
 }
 
 static void arduino_user_task2
@@ -177,12 +186,13 @@ static void arduino_user_task2
         uint32_t initial_data
     )
 {
+    printf("TASK %s running...\n", __FUNCTION__);
 
-    printf("arduino_user_task2 is running!!\n");
-
-    while (TRUE)  {
+    while (SKETCH_RUNNING) {
     	user_task2();
     }
+
+    _task_block();
 }
 
 static void arduino_user_task3
@@ -190,12 +200,13 @@ static void arduino_user_task3
         uint32_t initial_data
     )
 {
+    printf("TASK %s running...\n", __FUNCTION__);
 
-    printf("arduino_user_task3 is running!!\n");
-
-    while (TRUE)  {
+    while (SKETCH_RUNNING) {
     	user_task3();
     }
+
+    _task_block();
 }
 
 /******************************************************************************
@@ -209,73 +220,69 @@ static void main_task
         uint32_t initial_data
     )
 {
-
-    AddMsk_Shared_RAM (ADDR_SHARED_TRACE_FLAGS, MSK6_SHARED_TRACE_FLAGS);
-
-    printf("\n\nmain_task is running...........\n");
+    printf("TASK %s running...\n", __FUNCTION__);
+    AddMsk_Shared_RAM (ADDR_SHARED_TRACE_FLAGS, TRACE06_MAIN_TASK_RUN);
 
     // Create exit task
+    printf("Creating exit task...\n");
     main_task_id = _task_create(0, 5, 0);
     if (main_task_id == MQX_NULL_TASK_ID) {
-	    printf("\n Could not create exit task\n");
-	    _task_block();
-    } else {
-	    printf("Exit task created \n");
+        printf("ERROR: Could not create exit task!\n");
+        _task_block();
     }
 
     // arduino init
+    printf("==========================\n");
+    printf("%s: calling init()...\n", __FUNCTION__);
     init();
+    printf("==========================\n");
+    printf("%s: calling setup()...\n", __FUNCTION__);
     setup();
+    printf("==========================\n");
 
     // Create task for arduino loop()
+    printf("%s: starting task arduino_loop_task...\n", __FUNCTION__);
     loop_task_id = _task_create(0, 2, 0);
     if (loop_task_id == MQX_NULL_TASK_ID) {
-	    printf("\n Could not create arduino_loop_task\n");
-	    _task_block();
-    } else {
-	    printf("arduino_loop_task created \n");
+        printf("ERROR: could not create arduino_loop_task!\n");
+        _task_block();
     }
 
     // Create task for arduino_yield
+    printf("%s: starting task arduino_yield_task...\n", __FUNCTION__);
     yield_task_id = _task_create(0, 4, 0);
     if (yield_task_id == MQX_NULL_TASK_ID) {
-	    printf("\n Could not create arduino_yield_task\n");
-	    _task_block();
-    } else {
-	    printf("arduino_yield_task created \n");
+        printf("ERROR: could not create arduino_yeld_task!\n");
+        _task_block();
     }
 
 #ifdef USER_TASK_ENABLED
     // Create user task1
+    printf("%s: starting task user_task1...\n", __FUNCTION__);
     created_task_id = _task_create(0, 7, 0);
     if (created_task_id == MQX_NULL_TASK_ID) {
-	    printf("\n Could not create user_task1\n");
-	    _task_block();
-    } else {
-	    printf("user task1 created \n");
+        printf("ERROR: could not create user_task1!\n");
+        _task_block();
     }
 
     // Create user task2
+    printf("%s: starting task user_task2...\n", __FUNCTION__);
     created_task_id = _task_create(0, 8, 0);
     if (created_task_id == MQX_NULL_TASK_ID) {
-	    printf("\n Could not create user_task2\n");
-	    _task_block();
-    } else {
-	    printf("user task2 created \n");
+        printf("ERROR: could not create user_task2!\n");
+        _task_block();
     }
 
     // Create user task3
+    printf("%s: starting task user_task3...\n", __FUNCTION__);
     created_task_id = _task_create(0, 9, 0);
     if (created_task_id == MQX_NULL_TASK_ID) {
-	    printf("\n Could not create user_task2\n");
-	    _task_block();
-    } else {
-	    printf("user task2 created \n");
+        printf("ERROR: could not create user_task3!\n");
+        _task_block();
     }
 #endif
 
-
-    printf("main-task blocked !!\n");
+    printf("%s: task blocked\n", __FUNCTION__);
     _task_block();
 }
 
