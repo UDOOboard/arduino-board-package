@@ -260,4 +260,3 @@ static void main_task(uint32_t initial_data)
     RemoveMsk_Shared_RAM(ADDR_SHARED_TRACE_FLAGS, TRACE06_MAIN_TASK_RUN);
     _task_block();
 }
-

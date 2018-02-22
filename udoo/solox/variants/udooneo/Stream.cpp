@@ -29,33 +29,29 @@
 #define PARSE_TIMEOUT 1000  // default number of milli-seconds to wait
 #define NO_SKIP_CHAR  1  // a magic char not found in a valid ASCII numeric field
 
-// private method to read stream with timeout
+// protected method to read stream with timeout
 int Stream::timedRead()
 {
   int c;
   _startMillis = millis();
   do {
-	  c = read();
-	  if (c >= 0) return c;
-	  mqx_sched_yield();
+    c = read();
+    if (c >= 0) return c;
+    mqx_sched_yield();
   } while(millis() - _startMillis < _timeout);
-
   return -1;     // -1 indicates timeout
 }
 
-// private method to peek stream with timeout
+// protected method to peek stream with timeout
 int Stream::timedPeek()
 {
   int c;
-
   _startMillis = millis();
   do {
-	  c = peek();
-//    mqx_debug_int (2, c);
-	  if (c >= 0) return c;
-	  mqx_sched_yield();
+    c = peek();
+    if (c >= 0) return c;
+    mqx_sched_yield();
   } while(millis() - _startMillis < _timeout);
-
   return -1;     // -1 indicates timeout
 }
 
@@ -114,7 +110,6 @@ bool Stream::findUntil(char *target, size_t targetLen, char *terminator, size_t 
     return findMulti(t, 2) == 0 ? true : false;
   }
 }
-
 
 // returns the first valid (long) integer value from the current position.
 // initial characters that are not digits (or the minus sign) are skipped

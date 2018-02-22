@@ -17,8 +17,7 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#ifndef _WIRING_
-#define _WIRING_
+#pragma once
 
 #ifdef __cplusplus
 extern "C" {
@@ -58,5 +57,4 @@ extern uint32_t micros_finer( void ) ;
 }
 #endif
 
-#endif /* _WIRING_ */
 // delay_finer function blocks all other tasks except exit_task

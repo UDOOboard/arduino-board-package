@@ -21,15 +21,15 @@
 #ifndef Arduino_h
 #define Arduino_h
 
+#include <stdbool.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
-#include <stdbool.h>
 #include <math.h>
 
-// some libraries and sketches depend on this
-// AVR stuff, assuming Arduino.h or WProgram.h
-// automatically includes it...
+// some libraries and sketches depend on this AVR stuff,
+// assuming Arduino.h or WProgram.h automatically includes it...
+//
 #include <avr/pgmspace.h>
 
 #include "binary.h"
@@ -91,15 +91,17 @@ typedef enum _EPWMChannel
 
 #ifdef __cplusplus
 } // extern "C"
+#endif
 
-#include "WCharacter.h"
-#include "WString.h"
-#include "Tone.h"
-#include "WMath.h"
-#include "HardwareSerial.h"
-#include "wiring_pulse.h"
-
-#endif // __cplusplus
+// The following headers are for C++ only compilation
+#ifdef __cplusplus
+  #include "WCharacter.h"
+  #include "WString.h"
+  #include "Tone.h"
+  #include "WMath.h"
+  #include "HardwareSerial.h"
+  #include "wiring_pulse.h"
+#endif
 
 // Include board variant
 #include "variant.h"

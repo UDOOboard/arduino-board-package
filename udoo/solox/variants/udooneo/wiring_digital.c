@@ -153,4 +153,3 @@ extern int digitalRead( uint32_t ulPin )
 #ifdef __cplusplus
 }
 #endif
-

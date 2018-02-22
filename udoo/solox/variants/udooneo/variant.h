@@ -17,8 +17,7 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#ifndef _VARIANT_ARDUINO_DUE_X_
-#define _VARIANT_ARDUINO_DUE_X_
+#pragma once
 
 /*----------------------------------------------------------------------------
  *        Definitions
@@ -67,6 +66,3 @@ extern UARTClass Serial;
 #define WIRE_INTERFACES_COUNT		2
 
 #define SPI_INTERFACES_COUNT 		1
-
-#endif /* _VARIANT_ARDUINO_DUE_X_ */
-

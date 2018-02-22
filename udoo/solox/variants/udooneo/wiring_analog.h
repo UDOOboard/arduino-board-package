@@ -17,8 +17,7 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#ifndef _WIRING_ANALOG_
-#define _WIRING_ANALOG_
+#pragma once
 
 #define ADC_HW_RESOLUTION	12
 
@@ -30,12 +29,13 @@ extern "C" {
 #endif
 
 /*
- * \brief SAM3 products have only one reference for ADC
+ * \brief M4 products have only one reference for ADC
  */
 typedef enum _eAnalogReference
 {
   AR_DEFAULT,
 } eAnalogReference ;
+
 
 /*
  * \brief Configures the reference voltage used for analog input (i.e. the value used as the top of the input range).
@@ -81,5 +81,3 @@ extern void analogOutputInit( void ) ;
 #ifdef __cplusplus
 }
 #endif
-
-#endif /* _WIRING_ANALOG_ */

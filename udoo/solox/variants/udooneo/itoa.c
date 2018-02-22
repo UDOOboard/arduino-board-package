@@ -21,11 +21,11 @@
 #include <string.h>
 
 #ifdef __cplusplus
-extern "C"{
-#endif // __cplusplus
+extern "C" {
+#endif
 
-#if 0
 /* reverse:  reverse string s in place */
+/*
 static void reverse( char s[] )
 {
   int i, j ;
@@ -38,22 +38,24 @@ static void reverse( char s[] )
     s[j] = c ;
   }
 }
+*/
 
 /* itoa:  convert n to characters in s */
+/*
 extern void itoa( int n, char s[] )
 {
   int i, sign ;
 
-  if ( (sign = n) < 0 )  /* record sign */
+  if ( (sign = n) < 0 )  // record sign
   {
-    n = -n;          /* make n positive */
+    n = -n;          // make n positive
   }
 
   i = 0;
   do
-  {       /* generate digits in reverse order */
-    s[i++] = n % 10 + '0';   /* get next digit */
-  } while ((n /= 10) > 0) ;     /* delete it */
+  {       // generate digits in reverse order
+    s[i++] = n % 10 + '0';   // get next digit
+  } while ((n /= 10) > 0) ;     // delete it
 
   if (sign < 0 )
   {
@@ -64,8 +66,7 @@ extern void itoa( int n, char s[] )
 
   reverse( s ) ;
 }
-
-#else
+*/
 
 extern char* itoa( int value, char *string, int radix )
 {
@@ -144,7 +145,7 @@ extern char* ultoa( unsigned long value, char *string, int radix )
   {
     return 0;
   }
- 
+
   while (v || tp == tmp)
   {
     i = v % radix;
@@ -157,15 +158,14 @@ extern char* ultoa( unsigned long value, char *string, int radix )
 
   sp = string;
 
- 
+
   while (tp > tmp)
     *sp++ = *--tp;
   *sp = 0;
 
   return string;
 }
-#endif /* 0 */
 
 #ifdef __cplusplus
 } // extern "C"
-#endif // __cplusplus
+#endif
