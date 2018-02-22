@@ -13,9 +13,6 @@
 
 */
 
-//#include <stdio.h>
-//#include <string.h>
-
 // this file is a wrapper for call mqx api without conflict with stdio.h, stdlib.h
 // fio.h redefine write, read etc..
 

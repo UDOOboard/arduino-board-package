@@ -27,9 +27,8 @@
 class HardwareSerial : public Stream
 {
   public:
-	//~
-    virtual void begin(unsigned long) = 0;	// fefr missing = 0
-    virtual void end() = 0;					// fefr missing = 0
+    virtual void begin(unsigned long) = 0;
+    virtual void end() = 0;
     virtual int available(void) = 0;
     virtual int peek(void) = 0;
     virtual int read(void) = 0;
