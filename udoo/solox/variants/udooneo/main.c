@@ -1,6 +1,7 @@
 /*HEADER**********************************************************************
 *
 * Copyright 2013 Freescale Semiconductor, Inc.
+* Copyright (c) 2015-2018 UDOO
 *
 * This software is owned or controlled by Freescale Semiconductor.
 * Use of this software is governed by the Freescale MQX RTOS License
@@ -15,19 +16,14 @@
 * a Freescale microprocessor, microcontroller, or digital signal processor.
 * See license agreement file for full license terms including other
 * restrictions.
-*****************************************************************************
-*
-* Comments:
-*   This file contains the source for the gpio example program.
-*
-*
 *END************************************************************************/
 
-#include "udoomqx.h"
 #include "mqx.h"
 #include "bsp.h"
 #include "log_mqx.h"
 #include "Arduino.h"
+
+#include "udoomqx.h"
 
 void serialEventRun(void);
 
