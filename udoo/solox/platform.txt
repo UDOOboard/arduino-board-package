@@ -33,31 +33,27 @@ compiler.warning_flags.all=-Wall -Wextra
 
 compiler.path=/usr/bin/
 compiler.c.cmd=arm-none-eabi-gcc
-compiler.c.flags=-c -g -Os {compiler.warning_flags} -mcpu=cortex-m4 -march=armv7e-m -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16 -fmessage-length=0 -ffunction-sections -fdata-sections -D_AEABI_LC_CTYPE=C -D__STRICT_ANSI__=1 -std=gnu11 -MMD
-# -MP -c
-# Note: -fno-rtti allows to libsupc++ to be not included, resulting in a
-# smaller binary (<50K).
-
+compiler.c.flags={compiler.m4f.flags} -mthumb -c -g -Os {compiler.warning_flags} -std=gnu11 -ffunction-sections -fdata-sections -fmessage-length=0 -D_AEABI_LC_CTYPE=C -D__STRICT_ANSI__=1 -MMD
 compiler.c.elf.cmd=arm-none-eabi-gcc
 compiler.c.elf.flags=-Os -Wl,--gc-sections -save-temps
+compiler.S.cmd=arm-none-eabi-gcc
 compiler.S.flags=-c -g -x assembler-with-cpp
 compiler.cpp.cmd=arm-none-eabi-g++
-compiler.cpp.flags=-c -g -Os {compiler.warning_flags} -mcpu=cortex-m4 -march=armv7e-m -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16 -Os -fmessage-length=0 -ffunction-sections -fdata-sections  -g -D_AEABI_LC_CTYPE=C -D__STRICT_ANSI__=1 -std=gnu++11 -fabi-version=0 -MMD 
-# -MP -c
+compiler.cpp.flags={compiler.m4f.flags} -mthumb -c -g -Os {compiler.warning_flags} -std=gnu++11 -ffunction-sections -fdata-sections -fmessage-length=0 -D_AEABI_LC_CTYPE=C -D__STRICT_ANSI__=1 -fabi-version=0 -MMD
 compiler.ar.cmd=arm-none-eabi-ar
 compiler.ar.flags=rcs
 compiler.objcopy.cmd=arm-none-eabi-objcopy
 #compiler.objcopy.eep.flags=-O ihex -j .eeprom --set-section-flags=.eeprom=alloc,load --no-change-warnings --change-section-lma .eeprom=0
 compiler.elf2hex.flags=-O binary
 compiler.elf2hex.cmd=arm-none-eabi-objcopy
-compiler.ldflags=
+compiler.ldflags={compiler.m4f.flags} -mthumb -Wl,--cref -Wl,--check-sections -Wl,--gc-sections -Wl,--unresolved-symbols=report-all -Wl,--warn-common -Wl,--warn-section-align
 compiler.size.cmd=arm-none-eabi-size
 compiler.define=-DARDUINO=123456
 compiler.combine.flags=-u _sbrk -u link -u _close -u _fstat -u _isatty -u _lseek -u _read -u _write -u _exit -u kill -u _getpid
+compiler.m4f.flags=-mcpu=cortex-m4 -march=armv7e-m -mfloat-abi=hard -mfpu=fpv4-sp-d16 -mthumb
 
 # this can be overriden in boards.txt
 build.extra_flags=
-#-DMQX_LOG -DMQX_EXTRA_LOG
 
 # These can be overridden in platform.local.txt
 compiler.c.extra_flags="-I{build.variant.path}/mqx/release/bsp" "-I{build.variant.path}/mqx/release/bsp/Sources" "-I{build.variant.path}/mqx/release" "-I{build.variant.path}/mqx/release/psp" "-I{build.variant.path}/mqx/release/mcc" "{compiler.define}"
@@ -65,23 +61,22 @@ compiler.c.elf.extra_flags="-T{build.variant.path}/linker_scripts/gcc/libs.ld"
 compiler.cpp.extra_flags="-I{build.variant.path}/mqx/release/bsp" "-I{build.variant.path}/mqx/release/bsp/Sources" "-I{build.variant.path}/mqx/release" "-I{build.variant.path}/mqx/release/psp" "-I{build.variant.path}/mqx/release/mcc" "{compiler.define}"
 compiler.ar.extra_flags=
 compiler.elf2hex.extra_flags=
-compiler.libsam.c.flags=
 
 # Default usb manufacturer will be replaced at compile time using
-# numeric vendor ID if available or by board's specific value. 
+# numeric vendor ID if available or by board's specific value.
 build.usb_manufacturer="Unknown"
 
-
-# SAM3 compile patterns
-# ---------------------
+# Compile patterns
+# ----------------
 
 ## Compile c files
-recipe.c.o.pattern="{compiler.path}{compiler.c.cmd}" {compiler.c.flags} -mcpu={build.mcu} {compiler.c.extra_flags} {build.extra_flags} {compiler.libsam.c.flags} {includes} "{source_file}" -o "{object_file}"
-# -MF"{object_file}"
+recipe.c.o.pattern="{compiler.path}{compiler.c.cmd}" {compiler.c.flags} -DF_CPU={build.f_cpu} -DARDUINO={runtime.ide.version} -DARDUINO_{build.board} -DARDUINO_ARCH_{build.arch} {compiler.c.extra_flags} {build.extra_flags} {compiler.m4f.flags} {includes} "{source_file}" -o "{object_file}"
 
 ## Compile c++ files
-recipe.cpp.o.pattern="{compiler.path}{compiler.cpp.cmd}" {compiler.cpp.flags} -mcpu={build.mcu} {compiler.cpp.extra_flags} {build.extra_flags} {compiler.libsam.c.flags} {includes} "{source_file}" -o "{object_file}"
-# -MF"{object_file}"
+recipe.cpp.o.pattern="{compiler.path}{compiler.cpp.cmd}" {compiler.cpp.flags} -DF_CPU={build.f_cpu} -DARDUINO={runtime.ide.version} -DARDUINO_{build.board} -DARDUINO_ARCH_{build.arch} {compiler.cpp.extra_flags} {build.extra_flags} {compiler.m4f.flags} {includes} "{source_file}" -o "{object_file}"
+
+## Compile S files
+recipe.S.o.pattern="{compiler.path}{compiler.S.cmd}" {compiler.S.flags} -DF_CPU={build.f_cpu} -DARDUINO={runtime.ide.version} -DARDUINO_{build.board} -DARDUINO_ARCH_{build.arch} {compiler.S.extra_flags} {build.extra_flags} {compiler.m4f.flags} {includes} "{source_file}" -o "{object_file}"
 
 ## Create archives
 # excluded core.a creation because linker doesn't include some system libraries
@@ -93,27 +88,24 @@ recipe.cpp.o.pattern="{compiler.path}{compiler.cpp.cmd}" {compiler.cpp.flags} -m
 archive_file_path={build.path}/{archive_file}
 recipe.ar.pattern="{compiler.path}{compiler.ar.cmd}" {compiler.ar.flags} {compiler.ar.extra_flags} "{archive_file_path}" "{object_file}"
 
-#link all
-recipe.c.combine.pattern="{compiler.path}{compiler.c.elf.cmd}" -mcpu=cortex-m4 -march=armv7e-m -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16 -Os -fmessage-length=0 -ffunction-sections -fdata-sections  -g "-L{build.path}" "-L{build.variant.path}/mqx/release/psp" "-L{build.variant.path}/mqx/release/bsp" "-L{build.variant.path}/mqx/release/mcc" "-L/usr/lib/arm-none-eabi/lib/armv7e-m/fpu" "-T{build.variant.path}/{build.ldscript}" "-T{build.variant.path}/linker_scripts/gcc/libs.ld" -nostartfiles -nodefaultlibs -nostdlib -Xlinker --gc-sections "-Wl,-Map,{build.path}/{build.project_name}.map" -Xlinker --cref -z muldefs -o "{build.path}/{build.project_name}.elf" {compiler.combine.flags} {object_files}
-# "{build.path}/{archive_file}"
+## Combine gc-sections, archives, and objects
+recipe.c.combine.pattern="{compiler.path}{compiler.c.elf.cmd}" {compiler.m4f.flags} -Os -fmessage-length=0 -ffunction-sections -fdata-sections  -g "-L{build.path}" "-L{build.variant.path}/mqx/release/psp" "-L{build.variant.path}/mqx/release/bsp" "-L{build.variant.path}/mqx/release/mcc" "-L/usr/lib/arm-none-eabi/lib/armv7e-m/fpu" "-T{build.variant.path}/{build.ldscript}" "-T{build.variant.path}/linker_scripts/gcc/libs.ld" -nostartfiles -nodefaultlibs -nostdlib -Xlinker --gc-sections "-Wl,-Map,{build.path}/{build.project_name}.map" -Xlinker --cref -z muldefs -o "{build.path}/{build.project_name}.elf" {compiler.combine.flags} {object_files}
 
-#-gdwarf-2 -gstrict-dwarf , indagare
-
-## Create output (.bin file)
+## Create output (bin file)
 recipe.objcopy.bin.pattern="{compiler.path}{compiler.elf2hex.cmd}" {compiler.elf2hex.flags} {compiler.elf2hex.extra_flags} "{build.path}/{build.project_name}.elf" "{build.path}/{build.project_name}.bin"
 
 ## Compute size
 recipe.size.pattern="{compiler.path}{compiler.size.cmd}" -A "{build.path}/{build.project_name}.elf"
 recipe.size.regex=\.text\s+([0-9]+).*
 
-# M4 Uploader tools 
-# -------------------
+# Uploader tools
+# --------------
 
 tools.udooclient.path={runtime.tools.udooclient.path}
 tools.udooclient.cmd=udooclient
 tools.udooclient.cmd.windows=udooclient.exe
-tools.udooclient.upload.params.verbose=-v
-tools.udooclient.upload.params.quiet=-q
+tools.udooclient.upload.params.verbose=
+tools.udooclient.upload.params.quiet=
 tools.udooclient.upload.pattern="{path}/{cmd}" "192.168.7.2:5152" "{build.path}/{build.project_name}.bin"
 
 tools.m4uploader.path=/usr/bin

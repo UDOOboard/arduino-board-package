@@ -25,6 +25,9 @@
 // for Arduino sketch compliant
 #define digitalPinToInterrupt(p)	(p)
 
+/** Master clock frequency */
+#define VARIANT_MCK			  (227368421ul)
+
 /*----------------------------------------------------------------------------
  *        Headers
  *----------------------------------------------------------------------------*/
