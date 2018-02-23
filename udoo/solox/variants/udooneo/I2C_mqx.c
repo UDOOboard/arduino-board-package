@@ -54,22 +54,17 @@ void mqx_towire_begin (uint8_t i2cId)
 {
 	_imx_i2c_int_install(_mqx_i2c_info[i2cId].namePtr, _mqx_i2c_info[i2cId].initPtr);
 	i2c_fd[i2cId] = fopen (_mqx_i2c_info[i2cId].namePtr, NULL);
-	if(i2c_fd[i2cId] == NULL )
-	{
-		/* device could not be opened */
-		printf("\nFatal Error: I2C Device \"%s\" open fail.\n", _mqx_i2c_info[i2cId].namePtr);
+	if (i2c_fd[i2cId] == NULL ) {
+		printf("\nFATAL ERROR: cannot open I2C device \"%s\"!\n", _mqx_i2c_info[i2cId].namePtr);
 		_task_block();
 	}
 	else {
-		printf("\nI2C Device \"%s\" open OK.\n", _mqx_i2c_info[i2cId].namePtr);
+		printf("\nI2C device \"%s\" opened.\n", _mqx_i2c_info[i2cId].namePtr);
 	}
 
 #ifdef MQX_LOG_I2C
     I2C_STATISTICS_STRUCT stats;
     _mqx_int              param;
-    //, result, c;
-    //unsigned char        *buffer;
-
 
     printf ("Wire.begin log....... ... \n");
     printf ("Get current baud rate ... ");

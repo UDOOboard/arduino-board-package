@@ -66,25 +66,23 @@ int mqx_uartclass_init_mcc (void)
 
     ret_value = mcc_initialize(NODE_NUM);
     if (ret_value != MCC_SUCCESS) {
-        printf("\n\n\nError, attempting to initialize the MCC library failed! Application is stopped now. Error code = %i\n", ret_value);
+        printf("FATAL ERROR: cannot initialize the MCC library! Error code = %i. Application will be stopped!\n", ret_value);
         mcc_destroy(NODE_NUM);
         _task_block();
     }
 
     ret_value = mcc_create_endpoint(&mqx_endpoint_m4, MCC_PORT_M4);
     if (ret_value != MCC_SUCCESS) {
-        printf("\n\n\nError, failed to create m4 mcc ep. Error code = %i\n", ret_value);
+        printf("ERROR: failed to create m4 mcc endpoint. Error code = %i\n", ret_value);
     }
     mccIsInitialized = TRUE;
 
 #ifdef ARDUINO_SERIAL_DEBUG_RX
-    // Create task for uart rx
+		printf("%s: starting task mqx_mccuart_rx_task...\n", __FUNCTION__);
     serial_task_id_mcc = _task_create(0, TASK_MCCRX, 0);
     if (serial_task_id_mcc == MQX_NULL_TASK_ID) {
-        printf("Could not create mqx_receive_task\n");
+		  	printf("ERROR: could not create mqx_mccuart_rx_task!\n");
         _task_block();
-    } else {
-        printf("mqx_receive_task created \n");
     }
 #endif
 
@@ -108,14 +106,12 @@ void mqx_uartclass_end_mcc (void)
         // Destroy the mutex */
         _mutex_destroy(&mcc_mutex);
         mccIsInitialized = FALSE;
-
         mccSendCounter = 0;
     }
 }
 
 void mqx_uartclass_flush_mcc (void)
 {
-
 }
 
 int32_t mqx_uartclass_write_mcc (const uint8_t uc_data)
@@ -174,12 +170,9 @@ int32_t mqx_uartclass_write_buffer_mcc (const uint8_t *ptr, uint16_t len)
 
         _mutex_unlock(&mcc_mutex);
         if (ret_value != MCC_SUCCESS) {
-            printf("\nMCC Error[%d], sending the message using the send buffer function failed\n",
-                   ret_value);
-            printf("M4 endpoint [%i,%i,%i]\n", mqx_endpoint_m4.core,
-                   mqx_endpoint_m4.node, mqx_endpoint_m4.port);
-            printf("A9 endpoint [%i,%i,%i]\n", mqx_endpoint_a9.core,
-                   mqx_endpoint_a9.node, mqx_endpoint_a9.port);
+            printf("\nMCC Error[%d], sending the message using the send buffer function failed\n", ret_value);
+            printf("M4 endpoint [%i,%i,%i]\n", mqx_endpoint_m4.core, mqx_endpoint_m4.node, mqx_endpoint_m4.port);
+            printf("A9 endpoint [%i,%i,%i]\n", mqx_endpoint_a9.core, mqx_endpoint_a9.node, mqx_endpoint_a9.port);
             return -1;
         }
         return len;
@@ -216,14 +209,8 @@ void mqx_mccuart_rx_task(uint32_t initial_data)
             }
             else {
                 printf("\nMCC Error[%d], mcc_recv\n", ret_value);
-                printf("M4 endpoint [%i,%i,%i]\n",
-                       mqx_endpoint_m4.core,
-                       mqx_endpoint_m4.node,
-                       mqx_endpoint_m4.port);
-                printf("A9 endpoint [%i,%i,%i]\n",
-                       mqx_endpoint_a9.core,
-                       mqx_endpoint_a9.node,
-                       mqx_endpoint_a9.port);
+                printf("M4 endpoint [%i,%i,%i]\n", mqx_endpoint_m4.core, mqx_endpoint_m4.node, mqx_endpoint_m4.port);
+                printf("A9 endpoint [%i,%i,%i]\n", mqx_endpoint_a9.core, mqx_endpoint_a9.node, mqx_endpoint_a9.port);
             }
         }
     }

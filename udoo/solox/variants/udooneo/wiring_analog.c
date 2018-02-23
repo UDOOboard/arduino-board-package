@@ -150,24 +150,22 @@ void analogReference(eAnalogReference ulMode)
 
 uint32_t analogRead( uint32_t ulPin )
 {
-    LWADC_VALUE         raw, normRaw;
+  LWADC_VALUE raw;
 	bool done = false;
 
-    if (lwadc_inputs == NULL) {
-        printf("Error, Insufficient memory to run full test\n.");
-        _task_block();
-    }
+  if (lwadc_inputs == NULL) {
+    printf("Error, Insufficient memory to run full test\n.");
+    _task_block();
+  }
 
-    if (ulPin > A5) return (0);
+  if (ulPin > A5) return (0);
 
 	do {
-    	done = _lwadc_wait_next(&lwadc_inputs[ulPin]);
-    }while (!done);
+  	done = _lwadc_wait_next(&lwadc_inputs[ulPin]);
+  } while (!done);
 	_lwadc_read_raw(&lwadc_inputs[ulPin], &raw);
-	printf ("analog pin = %d sensorValue = %d\n", ulPin, raw);
-	normRaw = mapResolution(raw, ADC_HW_RESOLUTION, _readResolution);
-
-	return normRaw;
+	// printf("analog pin = %d sensorValue = %d\n", ulPin, raw);
+	return mapResolution(raw, ADC_HW_RESOLUTION, _readResolution);
 }
 
 void analogOutputInit(void) {
@@ -207,15 +205,14 @@ void analogWrite(uint32_t ulPin, uint32_t ulValue) {
 // as output or pwm remain at High level
 //-----------------------------------------
 void InitPins(void) {
-
 	int i;
 
-	printf ("Disable PWMs\n");
+	printf ("Disabling PWMs...\n");
 	for (i=PWM_CH0; i<=PWM_CH7; i++)
 		pwm_disable(i);
 	for (i=PWM_CH0; i<=PWM_CH7; i++)
 		_bsp_pwm_io_init(i, 0);
-	printf ("Configure pins in input\n");
+	printf ("Configuring pins in input...\n");
 	for (i=0; i<ARD_NMAX_DIO; i++)
 		pinMode(i,INPUT);
 }

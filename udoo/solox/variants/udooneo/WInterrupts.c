@@ -141,32 +141,29 @@ void attachInterrupt(uint32_t pin, void (*callback)(void), uint32_t mode)
 		break;
 	}
 
+  /* enable gpio functionality for given pin, react on falling/rising edge */
+  if (!lwgpio_int_init(&ardDio[pin], intMode)) {
+    printf("Initializing button GPIO for interrupt failed.\n");
+    _task_block();
+  }
 
-
-    /* enable gpio functionality for given pin, react on falling/rising edge */
-    if (!lwgpio_int_init(&ardDio[pin], intMode))
-    {
-        printf("Initializing button GPIO for interrupt failed.\n");
-        _task_block();
-    }
-
-    /* install gpio interrupt service routine */
-    _int_install_isr(lwgpio_int_get_vector(&ardDio[pin]), int_service_routine_ard_pin[pin], (void *) &ardDio[pin]);
-    /* set the interrupt level, and unmask the interrupt in interrupt controller */
-    int32_t r1 = _bsp_int_init(lwgpio_int_get_vector(&ardDio[pin]), 3, 0, TRUE);
+  /* install gpio interrupt service routine */
+  _int_install_isr(lwgpio_int_get_vector(&ardDio[pin]), int_service_routine_ard_pin[pin], (void *) &ardDio[pin]);
+  /* set the interrupt level, and unmask the interrupt in interrupt controller */
+  int32_t r1 = _bsp_int_init(lwgpio_int_get_vector(&ardDio[pin]), 3, 0, TRUE);
 	printf("attachInterrupt() _bsp_int_init=%d\n", r1);
 
 	callback_ard_pin[pin] = callback;
 
-    /* enable interrupt on GPIO peripheral module */
-    lwgpio_int_clear_flag(&ardDio[pin]);
-    lwgpio_int_enable(&ardDio[pin], TRUE);
+  /* enable interrupt on GPIO peripheral module */
+  lwgpio_int_clear_flag(&ardDio[pin]);
+  lwgpio_int_enable(&ardDio[pin], TRUE);
 }
 
 void detachInterrupt(uint32_t pin)
 {
-    /* disable interrupt on GPIO peripheral module */
-    lwgpio_int_enable(&ardDio[pin], FALSE);
+  /* disable interrupt on GPIO peripheral module */
+  lwgpio_int_enable(&ardDio[pin], FALSE);
 	callback_ard_pin[pin] = NULL;
 	ardPinsCfg[pin] = 0;
 }

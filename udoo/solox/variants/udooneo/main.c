@@ -103,9 +103,7 @@ static void exit_task(uint32_t initial_data)
 
 	// destroy tasks
 	_task_destroy(loop_task_id);
-	printf("_task_destroy(loop_task_id)\n");
 	_task_destroy(yield_task_id);
-	printf("_task_destroy(yield_task_id)\n");
 	_time_delay(100);
 
 	deinit_hwtimer1();
@@ -113,15 +111,12 @@ static void exit_task(uint32_t initial_data)
 	mqx_towire_uninstall ();
 	mqx_spi_end ();
 
-	printf("call _mqx_exit\n");
-	_time_delay(100);
-
 	AddMsk_Shared_RAM(ADDR_SHARED_TRACE_FLAGS, TRACE12_MQX_EXIT);
-        printf("->->-> Quitting MQX\n");
-        _time_delay(100);
+  printf("->->-> Quitting MQX\n");
+  _time_delay(100);
 
 	_mqx_exit(1);
-	do {}while(1);
+	do {} while(1);
 }
 
 static void arduino_yield_task(uint32_t initial_data)
