@@ -55,12 +55,10 @@ void mqx_towire_begin (uint8_t i2cId)
 	_imx_i2c_int_install(_mqx_i2c_info[i2cId].namePtr, _mqx_i2c_info[i2cId].initPtr);
 	i2c_fd[i2cId] = fopen (_mqx_i2c_info[i2cId].namePtr, NULL);
 	if (i2c_fd[i2cId] == NULL ) {
-		printf("\nFATAL ERROR: cannot open I2C device \"%s\"!\n", _mqx_i2c_info[i2cId].namePtr);
+		printf("I2C: FATAL ERROR: cannot open I2C device \"%s\"!\n", _mqx_i2c_info[i2cId].namePtr);
 		_task_block();
 	}
-	else {
-		printf("\nI2C device \"%s\" opened.\n", _mqx_i2c_info[i2cId].namePtr);
-	}
+	// printf("I2C:  device \"%s\" opened.\n", _mqx_i2c_info[i2cId].namePtr);
 
 #ifdef MQX_LOG_I2C
     I2C_STATISTICS_STRUCT stats;
@@ -128,10 +126,10 @@ void mqx_towire_end (uint8_t i2cId)
 
 		int32_t error_code = _io_dev_uninstall(_mqx_i2c_info[i2cId].namePtr);
 		if (error_code != IO_OK) {
-			printf("Error uninstalling %s.\n", _mqx_i2c_info[i2cId].namePtr);
+			printf("I2C: error uninstalling %s\n", _mqx_i2c_info[i2cId].namePtr);
 			_task_block();
 		}
-		printf("Uninstall %s.\n", _mqx_i2c_info[i2cId].namePtr);
+		// printf("I2C: uninstalling %s\n", _mqx_i2c_info[i2cId].namePtr);
 	}
 }
 
