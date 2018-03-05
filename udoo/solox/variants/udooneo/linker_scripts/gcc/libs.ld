@@ -11,5 +11,6 @@ GROUP (
 	libnosys.a
 	libsupc++.a 
 	libgcc.a
+  /* udooneo.a */
 )
 
