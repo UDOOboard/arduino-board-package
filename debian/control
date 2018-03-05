@@ -5,7 +5,6 @@ Maintainer: Ettore Chimenti <ek5.chimenti@gmail.com>
 Build-Depends: debhelper (>= 9.0.0)
 Standards-Version: 3.9.5
 Homepage: http://www.udoo.org
-#Vcs-Git: git://git.debian.org/collab-maint/arduino-board-package.git
 Vcs-Browser: https://github.com/UDOOboard/arduino-board-package
 
 Package: arduino-core-udooqdl
@@ -32,3 +31,9 @@ Description: Code, examples, and libs for the UDOO Neo platform
  .
  This package does not include the Java based Integrated Development
  Environment, which can be found in the 'arduino' package.
+
+Package: arduino-core-udooneo-prebuilt
+Architecture: all
+Depends: ${shlibs:Depends}, ${misc:Depends}, arduino-core-udooneo
+Description: Prebuilt files for arduino-core-udooneo
+

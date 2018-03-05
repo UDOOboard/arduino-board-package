@@ -4,6 +4,7 @@
 debian/*.log
 debian/*.substvars
 debian/arduino-core-udooneo/
+debian/arduino-core-udooneo-prebuilt/
 debian/arduino-core-udooqdl/
 debian/debhelper-build-stamp
 debian/files
