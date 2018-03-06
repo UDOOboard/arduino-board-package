@@ -3,6 +3,8 @@ set -e
 
 cd /usr/share/arduino/hardware/UDOO/solox/variants/udooneo/
 tar xfz udooneo.tgz
+sed -i 's;udooneo.a;/\* udooneo.a \*/;' linker_scripts/gcc/libs.ld
+rm udooneo.a
 
 exit 0
 
