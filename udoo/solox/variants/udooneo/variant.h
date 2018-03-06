@@ -43,11 +43,16 @@
  *----------------------------------------------------------------------------*/
 
 #ifdef __cplusplus
-
 extern UARTClass Serial0;
 extern UARTClass Serial;
-
 #endif
+
+/*
+ * LEDs
+ */
+#define PIN_LED_13           (13u)
+#define PIN_LED              PIN_LED_13
+#define LED_BUILTIN          13
 
 // These serial port names are intended to allow libraries and architecture-neutral
 // sketches to automatically default to the correct port name for a particular type
