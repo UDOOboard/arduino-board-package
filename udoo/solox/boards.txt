@@ -17,5 +17,6 @@ udooneo.build.ldscript=linker_scripts/gcc/ddr.ld
 udooneo.build.variant=udooneo
 udooneo.build.variant_system_lib_mqxbsp=mqx/release/bsp/bsp.a
 udooneo.build.variant_system_lib_mqxpsp=mqx/release/psp/psp.a
+udooneo.build.variant_system_lib_udooneo=udooneo.a
 udooneo.build.vid=0x2341
 udooneo.build.pid=0x003e

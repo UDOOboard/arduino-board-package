@@ -10,3 +10,18 @@ export DH_OPTIONS
 
 %:
 	dh $@ 
+
+override_dh_auto_clean:
+	rm -rf debian/build
+
+override_dh_auto_build:
+	./debian/neo-build.sh
+	ls -l debian/build
+
+override_dh_install:
+	dh_install
+	rm -rf debian/arduino-core-udooneo/usr/share/arduino/hardware/UDOO/solox/variants/udooneo/*.c
+	rm -rf debian/arduino-core-udooneo/usr/share/arduino/hardware/UDOO/solox/variants/udooneo/*.cpp
+	cp debian/build/udooneo.a debian/arduino-core-udooneo/usr/share/arduino/hardware/UDOO/solox/variants/udooneo/
+	sed -e "s;\/\*udooneo.a\*\/;/usr/share/arduino/hardware/UDOO/solox/variants/udooneo/udooneo.a;g" -i debian/arduino-core-udooneo/usr/share/arduino/hardware/UDOO/solox/variants/udooneo/linker_scripts/gcc/libs.ld
+	sed -e "s;\/\*udooneo.a\*\/;/usr/share/arduino/hardware/UDOO/solox/variants/udooneo/udooneo.a;g" -i debian/arduino-core-udooneo/usr/share/arduino/hardware/UDOO/solox/variants/udooneo/debug_scripts/gcc/libs.ld

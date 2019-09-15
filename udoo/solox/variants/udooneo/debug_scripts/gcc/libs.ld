@@ -2,6 +2,7 @@
 /* se le chiamo nel "recipe.c.combine.pattern", definito in platform.txt vedo errore (bsp.a not found) */
 
 GROUP (
+	/*udooneo.a*/
 	bsp.a
 	psp.a
 	open-amp.a

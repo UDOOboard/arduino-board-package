@@ -1,3 +1,9 @@
+arduino-board-package (1.7.0) bionic; urgency=medium
+
+  * UDOO Neo: support RPMSG and avoid to rebuild MQX bindings every sketch
+
+ -- Francesco Montefoschi <francesco.montefoschi@udoo.org>  Sun, 15 Sep 2019 22:05:56 +0000
+
 arduino-board-package (1.6.6) UNRELEASED; urgency=medium
 
   * Building release

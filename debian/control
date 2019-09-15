@@ -9,7 +9,7 @@ Homepage: http://www.udoo.org
 Vcs-Browser: https://github.com/UDOOboard/arduino-board-package
 
 Package: arduino-core-udooqdl
-Architecture: all
+Architecture: armhf
 Depends: ${shlibs:Depends}, ${misc:Depends}, arduino-core (>= 1.6.5), bossac-udoo,
   gcc-arm-none-eabi ( >= 4.9.3 ), libstdc++-arm-none-eabi-newlib ( >= 4.9.2 )
 Description: Code, examples, and libs for the UDOO Quad/Dual platform
@@ -21,7 +21,7 @@ Description: Code, examples, and libs for the UDOO Quad/Dual platform
  Environment, which can be found in the 'arduino' package.
 
 Package: arduino-core-udooneo
-Architecture: all
+Architecture: armhf
 Depends: ${shlibs:Depends}, ${misc:Depends}, arduino-core (>= 1.6.5), 
  udooneo-m4uploader, gcc-arm-none-eabi ( >= 4.9.3 ), 
  libstdc++-arm-none-eabi-newlib ( >= 4.9.2 )
