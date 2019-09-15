@@ -35,14 +35,12 @@
 /* default implementation: may be overridden */
 size_t Print::write(const uint8_t *buffer, size_t size)
 {
-
+	if (size == 0) return 0;
 	size_t n = 0;
-
-	if (size == 0) return (n);
 
 	if (is_rpmsg) {
 		n = mqx_uartclass_write_buffer_rpmsg (buffer, size);
-		if (n < 0) return (0);
+		if (n < 0) return 0;
 		return n;
 	}
 	else {

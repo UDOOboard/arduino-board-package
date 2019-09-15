@@ -83,7 +83,6 @@ const TASK_TEMPLATE_STRUCT  MQX_template_list[] =
 static _task_id loop_task_id = MQX_NULL_TASK_ID;
 static _task_id yield_task_id = MQX_NULL_TASK_ID;
 static _task_id exit_task_id = MQX_NULL_TASK_ID;
-static _task_id main_task_id = MQX_NULL_TASK_ID;
 
 static void exit_task(uint32_t initial_data)
 {
@@ -185,6 +184,7 @@ static void arduino_loop_task(uint32_t initial_data)
 	_task_block();
 }
 
+#ifdef USER_TASK_ENABLED
 static void arduino_user_task1(uint32_t initial_data)
 {
     printf("TASK %s running...\n", __FUNCTION__);
@@ -211,6 +211,7 @@ static void arduino_user_task3(uint32_t initial_data)
     	user_task3();
     }
 }
+#endif
 
 /******************************************************************************
 *
@@ -223,11 +224,10 @@ static void main_task(uint32_t initial_data)
     printf("TASK %s running...\n", __FUNCTION__);
     AddMsk_Shared_RAM (ADDR_SHARED_TRACE_FLAGS, MSK6_SHARED_TRACE_FLAGS);
 
-
     // Create exit task
 	printf("Creating exit task...\n");
-    main_task_id = _task_create(0, TASK_EXIT, 0);
-    if (main_task_id == MQX_NULL_TASK_ID) {
+    exit_task_id = _task_create(0, TASK_EXIT, 0);
+    if (exit_task_id == MQX_NULL_TASK_ID) {
 	    printf("ERROR: Could not create exit task!\n");
 	    _task_block();
     }

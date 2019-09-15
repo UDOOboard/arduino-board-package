@@ -20,8 +20,8 @@ extern const IMX_I2C_INIT_STRUCT 	_bsp_i2c4_init;
 
 typedef struct mqx_i2c_info
 {
-	IMX_I2C_INIT_STRUCT_PTR		initPtr;
-	uint8_t						*namePtr;
+	IMX_I2C_INIT_STRUCT_PTR initPtr;
+	char *                  namePtr;
 } MQX_I2C_INFO, * MQX_I2C_INFO_PTR;
 
 const MQX_I2C_INFO _mqx_i2c_info[NMAX_I2C] =
@@ -130,29 +130,28 @@ void mqx_towire_flush (uint8_t i2cId)
 int32_t mqx_towire_requestFrom(uint8_t i2cId, uint8_t address, uint8_t quantity, uint8_t sendStop, uint8_t *ptrRx)
 {
 	// perform blocking read into buffer
-	int readed = 0;
+	int read_bytes = 0;
 	int n = quantity;
-    _mqx_int result = I2C_OK;
 
     //fflush(i2c_fd[i2cId]);
 
-    result = ioctl (i2c_fd[i2cId], IO_IOCTL_I2C_REPEATED_START, NULL);
-    result = ioctl (i2c_fd[i2cId], IO_IOCTL_I2C_SET_RX_REQUEST, &n);
+    ioctl (i2c_fd[i2cId], IO_IOCTL_I2C_REPEATED_START, NULL);
+    ioctl (i2c_fd[i2cId], IO_IOCTL_I2C_SET_RX_REQUEST, &n);
 
-	readed = fread(ptrRx, 1, n, i2c_fd[i2cId]);
+	read_bytes = fread(ptrRx, 1, n, i2c_fd[i2cId]);
 
 	if (sendStop) {
-		result = ioctl (i2c_fd[i2cId], IO_IOCTL_I2C_STOP, NULL);
+		ioctl (i2c_fd[i2cId], IO_IOCTL_I2C_STOP, NULL);
 	}
 
 #ifdef MQX_LOG_I2C
 	int32_t i;
-	printf ("I2C readed ");
-	for (i=0; i<readed; i++)
+	printf ("I2C read ");
+	for (i=0; i<read_bytes; i++)
 		printf ("[%02X]", ptrRx[i]);
 	printf ("\n");
 #endif
-	return (readed);
+	return read_bytes;
 }
 
 int32_t mqx_towire_endTransmission(uint8_t i2cId, uint8_t address, uint8_t quantity, uint8_t sendStop, uint8_t *ptrTx)
@@ -178,7 +177,7 @@ int32_t mqx_towire_endTransmission(uint8_t i2cId, uint8_t address, uint8_t quant
 			printf ("IO_IOCTL_I2C_STOP - Error = [%d]\n", result);
 		}
 	}
-	return (result);
+	return result;
 }
 
 int32_t mqx_towire_setClock(uint8_t i2cId, uint32_t fr) {
@@ -187,7 +186,7 @@ int32_t mqx_towire_setClock(uint8_t i2cId, uint32_t fr) {
 
 	result = ioctl (i2c_fd[i2cId], IO_IOCTL_I2C_SET_BAUD, &fr);
 
-	return (result);
+	return result;
 }
 
 void mqx_towire_uninstall (void)

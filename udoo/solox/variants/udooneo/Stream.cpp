@@ -171,10 +171,10 @@ float Stream::parseFloat(char skipChar){
 
   c = peekNextDigit();
     // ignore non numeric leading characters
-  if(c < 0)
+  if (c < 0)
     return 0; // zero returned if timeout
 
-  do{
+  do {
     if(c == skipChar)
       ; // ignore
     else if(c == '-')

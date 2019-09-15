@@ -183,22 +183,11 @@ extern struct UARTClass Serial0;
 void mqx_uart_rx_task(uint32_t initial_data)
 {
 	uint8_t rxData;
-
 	AddMsk_Shared_RAM (ADDR_SHARED_TRACE_FLAGS, MSK11_SHARED_TRACE_FLAGS);
-
 	printf("TASK %s running...\n", __FUNCTION__);
 
-	uint32_t testCounter = 0;
-
     while (TRUE)  {
-
-    	int32_t res = read(serial_dev, &rxData, 1);
+    	read(serial_dev, &rxData, 1);
     	call_irq_handler(&Serial0, rxData);
-
-    	/*
-    	testCounter++;
-    	printf("testCounterRxTask=%d\n", testCounter);
-    	_time_delay(500);
-    	*/
     }
 }

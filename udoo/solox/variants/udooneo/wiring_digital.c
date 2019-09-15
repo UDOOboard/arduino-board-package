@@ -91,7 +91,7 @@ extern void pinMode( uint32_t ulPin, uint32_t ulMode )
             }
             /* swich pin functionality (MUX) to GPIO mode */
             lwgpio_set_functionality(&ardDio[ulPin], arduinoToMqx_Pin[ulPin].mux);
-	    bool sa = lwgpio_set_attribute(&ardDio[ulPin],
+	        lwgpio_set_attribute(&ardDio[ulPin],
 					   LWGPIO_ATTR_PULL_DOWN,
 					   LWGPIO_AVAL_ENABLE);
             ardPinsCfg[ulPin] = digitalInputPulldown;

@@ -24,6 +24,7 @@
 #include <bsp.h>
 #include <string.h>
 #include "udoomqx.h"
+#include "uty_mqx.h"
 #include "rpmsg/rpmsg_rtos.h"
 #include "log_mqx.h"
 
@@ -129,7 +130,7 @@ extern struct UARTClass Serial;
 
 void rpmsg_uart_rx_task(uint32_t initial_data)
 {
-	int32_t ret_value, received_bytes, i;
+	int ret_value, received_bytes, i;
 	RPMSG_UART_MESSAGE msg;
 	printf("TASK %s running...\n", __FUNCTION__);
 
