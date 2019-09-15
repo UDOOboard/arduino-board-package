@@ -1,5 +1,5 @@
 udooneo.name=UDOO Neo (Cortex M4)
-udooneo.upload.tool=udooclient
+udooneo.upload.tool=m4uploader
 udooneo.upload.protocol=sam-ba
 udooneo.upload.maximum_size=524288
 udooneo.upload.use_1200bps_touch=false

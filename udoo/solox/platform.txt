@@ -16,7 +16,7 @@ compiler.warning_flags.default=
 compiler.warning_flags.more=-Wall
 compiler.warning_flags.all=-Wall -Wextra
 
-compiler.path={runtime.tools.gcc-arm-none-eabi.path}/bin/
+compiler.path=/usr/bin/
 compiler.c.cmd=arm-none-eabi-gcc
 compiler.c.flags=-c -g -Os {compiler.warning_flags} -mcpu=cortex-m4 -march=armv7e-m -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16 -fmessage-length=0 -ffunction-sections -fdata-sections -D_AEABI_LC_CTYPE=C -D__STRICT_ANSI__=1 -std=gnu11 -MMD
 # -MP -c
