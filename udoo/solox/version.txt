@@ -1,9 +1,0 @@
-Versione 1.0, 22/07/2015
-
-Modulo GPIO, OK
-Modulo ADC, OK
-Modulo UART, solo tx
-Modulo I2C, OK
-Modulo SPI, da implementare
-Modulo PWM, da implementare
-
