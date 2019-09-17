@@ -1710,6 +1710,7 @@ void _mqx_init_task(uint32_t);
 #define MSK13_SHARED_TRACE_FLAGS        0x00001000        // rpmsg_init LOCKED
 #define MSK14_SHARED_TRACE_FLAGS        0x00002000        // rpmsg_tx_callback create channel
 #define MSK15_SHARED_TRACE_FLAGS        0x00004000        // rpmsg_uart_rx_task is running
+#define MSK16_SHARED_TRACE_FLAGS        0x00010000        // rpmsg could not init
 
 void AddMsk_Shared_RAM (uint32_t addr, uint32_t mask);
 void RemoveMsk_Shared_RAM (uint32_t addr, uint32_t mask);

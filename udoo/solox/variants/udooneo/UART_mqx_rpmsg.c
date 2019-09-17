@@ -59,8 +59,9 @@ void mqx_uartclass_init_rpmsg (void)
 
     if(RPMSG_SUCCESS != ret_value)
     {
-      mqx_debug_printf("\n\n\nError, rpmsg init failed! Task is stopped now. Error code = %i\n", ret_value);
-      _task_block();
+        AddMsk_Shared_RAM (ADDR_SHARED_TRACE_FLAGS, MSK16_SHARED_TRACE_FLAGS);
+        mqx_debug_printf("\n\n\nError, rpmsg init failed! Task is stopped now. Error code = %i\n", ret_value);
+        _task_block();
     }
 
 	if (RPMSG_INIT == 0) RPMSG_INIT = 1;
