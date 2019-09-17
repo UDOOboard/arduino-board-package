@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 mkdir -p debian/build/temp
 OUT=$(realpath debian/build/temp)
 
