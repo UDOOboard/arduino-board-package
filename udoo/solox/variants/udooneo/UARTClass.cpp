@@ -74,14 +74,14 @@ void UARTClass::end(void) {
 
 
 int UARTClass::available(void) {
-	return (uint32_t) (SERIAL_BUFFER_SIZE + _rx_buffer->_iHead - _rx_buffer->_iTail)
-			% SERIAL_BUFFER_SIZE;
+	return (uint32_t) (__SERIAL_BUFFER_SIZE + _rx_buffer->_iHead - _rx_buffer->_iTail)
+			% __SERIAL_BUFFER_SIZE;
 }
 
 int UARTClass::availableForWrite(void) {
 
 	// tobe completed by check available from serial driver
-	return (SERIAL_BUFFER_SIZE);
+	return __SERIAL_BUFFER_SIZE;
 /*
 	int head = _tx_buffer->_iHead;
 	int tail = _tx_buffer->_iTail;
@@ -116,7 +116,7 @@ int UARTClass::read(void) {
 
 	uint8_t uc = _rx_buffer->_aucBuffer[_rx_buffer->_iTail];
 	_rx_buffer->_iTail = (unsigned int) (_rx_buffer->_iTail + 1)
-				% SERIAL_BUFFER_SIZE;
+				% __SERIAL_BUFFER_SIZE;
 	return uc;
 }
 
