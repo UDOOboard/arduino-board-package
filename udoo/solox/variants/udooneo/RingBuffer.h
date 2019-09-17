@@ -25,18 +25,18 @@
 // using a ring buffer (I think), in which head is the index of the location
 // to which to write the next incoming character and tail is the index of the
 // location from which to read.
-#define SERIAL_BUFFER_SIZE 896	// if > 896 M4 sketch crashes!
+#define __SERIAL_BUFFER_SIZE 896	// if > 896 M4 sketch crashes!
 
 class RingBuffer
 {
   public:
-    volatile uint8_t _aucBuffer[SERIAL_BUFFER_SIZE] ;
-    volatile int _iHead ;
-    volatile int _iTail ;
+    volatile uint8_t _aucBuffer[__SERIAL_BUFFER_SIZE];
+    volatile int _iHead;
+    volatile int _iTail;
 
   public:
     RingBuffer( void ) ;
-    void store_char( uint8_t c ) ;
+    void store_char( uint8_t c );
 } ;
 
 #endif /* _RING_BUFFER_ */
