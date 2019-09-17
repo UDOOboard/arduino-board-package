@@ -81,8 +81,9 @@ void mqx_uartclass_end_rpmsg (void)
 		_task_destroy(TASK_RPMSGRX);
 		_task_destroy(TASK_RPMSG);
 		printf("RPMSG tasks %d and %d killed\n", TASK_RPMSGRX, TASK_RPMSG);
-		// do not call deinit, otherwise M4 is locked on an HW sema4!
-		// rpmsg_rtos_deinit(rdev);
+		printf("Calling rpmsg_rtos_deinit...\n");
+		rpmsg_rtos_deinit(rdev);
+		printf("Completed: rpmsg_rtos_deinit\n");
 		RPMSG_INIT = 0;
 	}
 }
