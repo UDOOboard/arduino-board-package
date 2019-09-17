@@ -1704,9 +1704,12 @@ void _mqx_init_task(uint32_t);
 #define MSK7_SHARED_TRACE_FLAGS         0x00000040        // exit_task is running
 #define MSK8_SHARED_TRACE_FLAGS         0x00000080        // arduino_loop_task is running
 #define MSK9_SHARED_TRACE_FLAGS         0x00000100        // arduino_yield_task is running
-#define MSK10_SHARED_TRACE_FLAGS        0x00000200        // rpmsg_uart_rx_task is running
+#define MSK10_SHARED_TRACE_FLAGS        0x00000200        // unused
 #define MSK11_SHARED_TRACE_FLAGS        0x00000400        // mqx_uart_rx_task is running
 #define MSK12_SHARED_TRACE_FLAGS        0x00000800        // _mqx_exit
+#define MSK13_SHARED_TRACE_FLAGS        0x00001000        // rpmsg_init LOCKED
+#define MSK14_SHARED_TRACE_FLAGS        0x00002000        // rpmsg_tx_callback create channel
+#define MSK15_SHARED_TRACE_FLAGS        0x00004000        // rpmsg_uart_rx_task is running
 
 void AddMsk_Shared_RAM (uint32_t addr, uint32_t mask);
 void RemoveMsk_Shared_RAM (uint32_t addr, uint32_t mask);
